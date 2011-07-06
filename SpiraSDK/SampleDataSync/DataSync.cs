@@ -18,8 +18,9 @@ namespace SampleDataSync
     public class DataSync : IServicePlugIn
     {
         //Constant containing data-sync name and internal API URL suffix to access
-        private const string DATA_SYNC_NAME = "SampleDataSync";
-        private const string EXTERNAL_SYSTEM_NAME = "External System";
+        private const string DATA_SYNC_NAME = "SampleDataSync"; //The name of the data-synchronization plugin
+        private const string EXTERNAL_SYSTEM_NAME = "External System";  //The name of the external system we're integrating with
+        private const string EXTERNAL_BUG_URL = "http://mybugtracker/{0}.htm";  //The URL format to use to link incidents to (leave null to not add a link)
 
         // Track whether Dispose has been called.
         private bool disposed = false;
@@ -146,7 +147,7 @@ namespace SampleDataSync
                 SpiraImportExport.ImportExportClient spiraImportExport = SpiraClientFactory.CreateClient(spiraUri);
 
                 /*
-                 * Add the code to connect and authenticate to the external system
+                 * TODO: Add the code to connect and authenticate to the external system
                  * Connect using the following variables:
                  *  this.connectionString
                  *  this.externalLogin
@@ -161,7 +162,7 @@ namespace SampleDataSync
                 if (!success)
                 {
                     //We can't authenticate so end
-                    eventLog.WriteEntry("Unable to authenticate with " + productName + " API, stopping data-synchronization", EventLogEntryType.Error);
+                    LogErrorEvent("Unable to authenticate with " + productName + " API, stopping data-synchronization", EventLogEntryType.Error);
                     return ServiceReturnType.Error;
                 }
                 SpiraImportExport.RemoteDataMapping[] projectMappings = spiraImportExport.DataMapping_RetrieveProjectMappings(dataSyncSystemId);
@@ -179,7 +180,7 @@ namespace SampleDataSync
                     if (!success)
                     {
                         //We can't connect so go to next project
-                        eventLog.WriteEntry("Unable to connect to " + productName + " project, please check that the " + productName + " login has the appropriate permissions", EventLogEntryType.Error);
+                        LogErrorEvent("Unable to connect to " + productName + " project, please check that the " + productName + " login has the appropriate permissions", EventLogEntryType.Error);
                         continue;
                     }
 
@@ -213,7 +214,7 @@ namespace SampleDataSync
                     SpiraImportExport.RemoteDataMapping[] releaseMappings = spiraImportExport.DataMapping_RetrieveArtifactMappings(dataSyncSystemId, (int)Constants.ArtifactType.Release);
 
                     /*
-                     * Next add the code to connect to the project in the external system if necessary
+                     * TODO: Next add the code to connect to the project in the external system if necessary
                      * The following variables can be used
                      *  this.externalLogin
                      *  this.externalPassword
@@ -257,7 +258,7 @@ namespace SampleDataSync
                                 if (dataMapping == null)
                                 {
                                     //We can't find the matching item so log and move to the next incident
-                                    eventLog.WriteEntry("Unable to locate mapping entry for incident status " + remoteIncident.IncidentStatusId + " in project " + projectId, EventLogEntryType.Error);
+                                    LogErrorEvent("Unable to locate mapping entry for incident status " + remoteIncident.IncidentStatusId + " in project " + projectId, EventLogEntryType.Error);
                                     continue;
                                 }
                                 string externalStatus = dataMapping.ExternalKey;
@@ -267,7 +268,7 @@ namespace SampleDataSync
                                 if (dataMapping == null)
                                 {
                                     //We can't find the matching item so log and move to the next incident
-                                    eventLog.WriteEntry("Unable to locate mapping entry for incident type " + remoteIncident.IncidentTypeId + " in project " + projectId, EventLogEntryType.Error);
+                                    LogErrorEvent("Unable to locate mapping entry for incident type " + remoteIncident.IncidentTypeId + " in project " + projectId, EventLogEntryType.Error);
                                     continue;
                                 }
                                 string externalType = dataMapping.ExternalKey;
@@ -280,7 +281,7 @@ namespace SampleDataSync
                                     if (dataMapping == null)
                                     {
                                         //We can't find the matching item so log and just don't set the priority
-                                        eventLog.WriteEntry("Unable to locate mapping entry for incident priority " + remoteIncident.PriorityId.Value + " in project " + projectId, EventLogEntryType.Warning);
+                                        LogErrorEvent("Unable to locate mapping entry for incident priority " + remoteIncident.PriorityId.Value + " in project " + projectId, EventLogEntryType.Warning);
                                     }
                                     else
                                     {
@@ -296,7 +297,7 @@ namespace SampleDataSync
                                     if (dataMapping == null)
                                     {
                                         //We can't find the matching item so log and just don't set the severity
-                                        eventLog.WriteEntry("Unable to locate mapping entry for incident severity " + remoteIncident.SeverityId.Value + " in project " + projectId, EventLogEntryType.Warning);
+                                        LogErrorEvent("Unable to locate mapping entry for incident severity " + remoteIncident.SeverityId.Value + " in project " + projectId, EventLogEntryType.Warning);
                                     }
                                     else
                                     {
@@ -310,7 +311,7 @@ namespace SampleDataSync
                                 //If we can't find the user, just log a warning
                                 if (dataMapping == null)
                                 {
-                                    eventLog.WriteEntry("Unable to locate mapping entry for user id " + remoteIncident.OpenerId.Value + " so using synchronization user", EventLogEntryType.Warning);
+                                    LogErrorEvent("Unable to locate mapping entry for user id " + remoteIncident.OpenerId.Value + " so using synchronization user", EventLogEntryType.Warning);
                                 }
                                 else
                                 {
@@ -325,7 +326,7 @@ namespace SampleDataSync
                                     //If we can't find the user, just log a warning
                                     if (dataMapping == null)
                                     {
-                                        eventLog.WriteEntry("Unable to locate mapping entry for user id " + remoteIncident.OwnerId.Value + " so leaving assignee empty", EventLogEntryType.Warning);
+                                        LogErrorEvent("Unable to locate mapping entry for user id " + remoteIncident.OwnerId.Value + " so leaving assignee empty", EventLogEntryType.Warning);
                                     }
                                     else
                                     {
@@ -350,7 +351,7 @@ namespace SampleDataSync
                                         if (remoteRelease != null)
                                         {
                                             /*
-                                             * Add the code to actually insert the new Release/Version in the external System
+                                             * TODO: Add the code to actually insert the new Release/Version in the external System
                                              * using the values from the remoteRelease object.
                                              * Need to get the ID of the new release from the external system and then
                                              * populate the externalDetectedRelease variable with the value
@@ -369,116 +370,138 @@ namespace SampleDataSync
                                         externalDetectedRelease = dataMapping.ExternalKey;
                                     }
 
-                                    //TODO: Continue from here
-
-                                    //Get the list of versions from the server and find the one that corresponds to the SpiraTest Release
-                                    JiraSoapService.RemoteVersion[] remoteVersions = jiraSoapService.getVersions(jiraToken, jiraProject);
-                                    JiraSoapService.RemoteVersion[] detectedVersion = new JiraSoapService.RemoteVersion[1];
-                                    LogTraceEvent(eventLog, "Looking for JIRA affected version: " + jiraVersionId + "\n", EventLogEntryType.Information);
+                                    //Verify that this release still exists in the external system
+                                    LogTraceEvent(eventLog, "Looking for " + EXTERNAL_SYSTEM_NAME + " detected release: " + externalDetectedRelease + "\n", EventLogEntryType.Information);
+                                    
+                                    /*
+                                     * TODO: Set the value of the matchFound flag based on whether the external release exists
+                                     */
+                                    
                                     bool matchFound = false;
-                                    for (int j = 0; j < remoteVersions.Length; j++)
+                                    if (matchFound)
                                     {
-                                        //See if we have an match, if not remove
-                                        if (remoteVersions[j].id == jiraVersionId)
-                                        {
-                                            detectedVersion[0] = remoteVersions[j];
-                                            jiraIssue.affectsVersions = detectedVersion;
-                                            LogTraceEvent(eventLog, "Found JIRA affected version: " + jiraVersionId + "\n", EventLogEntryType.Information);
-                                            matchFound = true;
-                                        }
+                                        //TODO: Set the externalRelease value on the external incident
                                     }
-                                    if (!matchFound)
+                                    else
                                     {
                                         //We can't find the matching item so log and just don't set the release
-                                        eventLog.WriteEntry("Unable to locate JIRA affected version " + jiraVersionId + " in project " + jiraProject, EventLogEntryType.Warning);
+                                        LogErrorEvent("Unable to locate " + EXTERNAL_SYSTEM_NAME + " detected release " + externalDetectedRelease + " in project " + externalProjectId, EventLogEntryType.Warning);
 
                                         //Add this to the list of mappings to remove
                                         SpiraImportExport.RemoteDataMapping oldReleaseMapping = new SpiraImportExport.RemoteDataMapping();
                                         oldReleaseMapping.ProjectId = projectId;
                                         oldReleaseMapping.InternalId = detectedReleaseId;
-                                        oldReleaseMapping.ExternalKey = jiraVersionId;
+                                        oldReleaseMapping.ExternalKey = externalDetectedRelease;
                                         oldReleaseMappings.Add(oldReleaseMapping);
                                     }
                                 }
-                                LogTraceEvent(eventLog, "Set issue affected version\n", EventLogEntryType.Information);
+                                LogTraceEvent(eventLog, "Set " + EXTERNAL_SYSTEM_NAME + " detected release\n", EventLogEntryType.Information);
 
                                 //Specify the resolved-in version/release if applicable
+                                string externalResolvedRelease = "";
                                 if (remoteIncident.ResolvedReleaseId.HasValue)
                                 {
                                     int resolvedReleaseId = remoteIncident.ResolvedReleaseId.Value;
-                                    dataMapping = FindMappingByInternalId(projectId, resolvedReleaseId, releaseMappings);
-                                    string jiraVersionId = null;
+                                    dataMapping = InternalFunctions.FindMappingByInternalId(projectId, resolvedReleaseId, releaseMappings);
                                     if (dataMapping == null)
                                     {
-                                        //We can't find the matching item so need to create a new version in JIRA and add to mappings
+                                        //We can't find the matching item so need to create a new version in the external system and add to mappings
                                         //Since version numbers are now unique in both systems, we can simply use that
-                                        LogTraceEvent(eventLog, "Adding new version in jira for release " + resolvedReleaseId + "\n", EventLogEntryType.Information);
-                                        JiraSoapService.RemoteVersion jiraVersion = new JiraSoapService.RemoteVersion();
-                                        jiraVersion.name = remoteIncident.ResolvedReleaseVersionNumber;
-                                        jiraVersion.archived = false;
-                                        jiraVersion.released = false;
-                                        jiraVersion = jiraSoapService.addVersion(jiraToken, jiraProject, jiraVersion);
+                                        LogTraceEvent(eventLog, "Adding new release in " + EXTERNAL_SYSTEM_NAME + " for release " + resolvedReleaseId + "\n", EventLogEntryType.Information);
 
-                                        //Add a new mapping entry
-                                        SpiraImportExport.RemoteDataMapping newReleaseMapping = new SpiraImportExport.RemoteDataMapping();
-                                        newReleaseMapping.ProjectId = projectId;
-                                        newReleaseMapping.InternalId = resolvedReleaseId;
-                                        newReleaseMapping.ExternalKey = jiraVersion.id;
-                                        newReleaseMappings.Add(newReleaseMapping);
-                                        jiraVersionId = jiraVersion.id;
+                                        //Get the Spira release
+                                        RemoteRelease remoteRelease = spiraImportExport.Release_RetrieveById(resolvedReleaseId);
+                                        if (remoteRelease != null)
+                                        {
+                                            /*
+                                             * TODO: Add the code to actually insert the new Release/Version in the external System
+                                             * using the values from the remoteRelease object.
+                                             * Need to get the ID of the new release from the external system and then
+                                             * populate the externalResolvedRelease variable with the value
+                                             */
+
+                                            //Add a new mapping entry
+                                            SpiraImportExport.RemoteDataMapping newReleaseMapping = new SpiraImportExport.RemoteDataMapping();
+                                            newReleaseMapping.ProjectId = projectId;
+                                            newReleaseMapping.InternalId = resolvedReleaseId;
+                                            newReleaseMapping.ExternalKey = externalResolvedRelease;
+                                            newReleaseMappings.Add(newReleaseMapping);
+                                        }
                                     }
                                     else
                                     {
-                                        jiraVersionId = dataMapping.ExternalKey;
+                                        externalResolvedRelease = dataMapping.ExternalKey;
                                     }
-                                    //Get the list of versions from the server and find the one that corresponds to the SpiraTest Release
-                                    JiraSoapService.RemoteVersion[] remoteVersions = jiraSoapService.getVersions(jiraToken, jiraProject);
-                                    JiraSoapService.RemoteVersion[] resolvedVersion = new JiraSoapService.RemoteVersion[1];
-                                    LogTraceEvent(eventLog, "Looking for JIRA fix version: " + jiraVersionId + "\n", EventLogEntryType.Information);
+
+                                    //Verify that this release still exists in the external system
+                                    LogTraceEvent(eventLog, "Looking for " + EXTERNAL_SYSTEM_NAME + " resolved release: " + externalResolvedRelease + "\n", EventLogEntryType.Information);
+
+                                    /*
+                                     * TODO: Set the value of the matchFound flag based on whether the external release exists
+                                     */
+
                                     bool matchFound = false;
-                                    for (int j = 0; j < remoteVersions.Length; j++)
+                                    if (matchFound)
                                     {
-                                        //See if we have an match, if not remove
-                                        if (remoteVersions[j].id == jiraVersionId)
-                                        {
-                                            resolvedVersion[0] = remoteVersions[j];
-                                            jiraIssue.fixVersions = resolvedVersion;
-                                            LogTraceEvent(eventLog, "Found JIRA fix version: " + jiraVersionId + "\n", EventLogEntryType.Information);
-                                            matchFound = true;
-                                        }
+                                        //TODO: Set the externalRelease value on the external incident
                                     }
-                                    if (!matchFound)
+                                    else
                                     {
                                         //We can't find the matching item so log and just don't set the release
-                                        eventLog.WriteEntry("Unable to locate JIRA fix version " + jiraVersionId + " in project " + jiraProject, EventLogEntryType.Warning);
+                                        LogErrorEvent("Unable to locate " + EXTERNAL_SYSTEM_NAME + " resolved release " + externalResolvedRelease + " in project " + externalProjectId, EventLogEntryType.Warning);
 
                                         //Add this to the list of mappings to remove
                                         SpiraImportExport.RemoteDataMapping oldReleaseMapping = new SpiraImportExport.RemoteDataMapping();
                                         oldReleaseMapping.ProjectId = projectId;
                                         oldReleaseMapping.InternalId = resolvedReleaseId;
-                                        oldReleaseMapping.ExternalKey = jiraVersionId;
+                                        oldReleaseMapping.ExternalKey = externalResolvedRelease;
                                         oldReleaseMappings.Add(oldReleaseMapping);
                                     }
                                 }
-                                LogTraceEvent(eventLog, "Set issue fix version\n", EventLogEntryType.Information);
+                                LogTraceEvent(eventLog, "Set " + EXTERNAL_SYSTEM_NAME + " resolved release\n", EventLogEntryType.Information);
 
-                                //Now iterate through the project custom properties to populate the special bugzilla fields
-                                string component = "";
-                                string operatingSystem = "";
-                                string hardware = "";
+                                //Setup the dictionary to hold the various custom properties to set on the Jira issue
+                                Dictionary<string, string> customPropertyValues = new Dictionary<string, string>();
+
+                                //Now iterate through the project custom properties
                                 if (projectCustomProperties != null)
                                 {
                                     foreach (SpiraImportExport.RemoteCustomProperty customProperty in projectCustomProperties)
                                     {
-                                        //For bugzilla we only care about the list ones
-                                        if (customProperty.CustomPropertyTypeId.HasValue && customProperty.CustomPropertyTypeId == CUSTOM_PROPERTY_TYPE_LIST)
+                                        //Handle list and text ones separately
+                                        if (customProperty.CustomPropertyTypeId.HasValue && customProperty.CustomPropertyTypeId == (int)Constants.CustomPropertyType.Text)
                                         {
+                                            LogTraceEvent(eventLog, "Checking text custom property: " + customProperty.Alias + "\n", EventLogEntryType.Information);
                                             //See if we have a custom property value set
-                                            Nullable<int> customPropertyValue = GetCustomPropertyListValue(remoteIncident, customProperty.CustomPropertyName);
+                                            String customPropertyValue = InternalFunctions.GetCustomPropertyTextValue(remoteIncident, customProperty.CustomPropertyName);
+                                            if (!String.IsNullOrEmpty(customPropertyValue))
+                                            {
+                                                LogTraceEvent(eventLog, "Got value for text custom property: " + customProperty.Alias + " (" + customPropertyValue + ")\n", EventLogEntryType.Information);
+                                                //Get the corresponding external custom field (if there is one)
+                                                if (customPropertyMappingList != null && customPropertyMappingList.ContainsKey(customProperty.CustomPropertyId))
+                                                {
+                                                    SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId];
+                                                    if (customPropertyDataMapping != null)
+                                                    {
+                                                        string externalCustomField = customPropertyDataMapping.ExternalKey;
+
+                                                        //This needs to be added to the list of external system custom properties
+                                                        customPropertyValues.Add(externalCustomField, customPropertyValue);
+                                                    }
+                                                }
+                                            }
+                                            LogTraceEvent(eventLog, "Finished with text custom property: " + customProperty.Alias + "\n", EventLogEntryType.Information);
+                                        }
+                                        if (customProperty.CustomPropertyTypeId.HasValue && customProperty.CustomPropertyTypeId == (int)Constants.CustomPropertyType.List)
+                                        {
+                                            LogTraceEvent(eventLog, "Checking list custom property: " + customProperty.Alias + "\n", EventLogEntryType.Information);
+                                            //See if we have a custom property value set
+                                            Nullable<int> customPropertyValue = InternalFunctions.GetCustomPropertyListValue(remoteIncident, customProperty.CustomPropertyName);
 
                                             //Get the corresponding external custom field (if there is one)
                                             if (customPropertyValue.HasValue && customPropertyMappingList != null && customPropertyMappingList.ContainsKey(customProperty.CustomPropertyId))
                                             {
+                                                LogTraceEvent(eventLog, "Got value for list custom property: " + customProperty.Alias + " (" + customPropertyValue + ")\n", EventLogEntryType.Information);
                                                 SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId];
                                                 if (customPropertyDataMapping != null)
                                                 {
@@ -490,71 +513,93 @@ namespace SampleDataSync
                                                         SpiraImportExport.RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId];
                                                         if (customPropertyValueMappings != null)
                                                         {
-                                                            SpiraImportExport.RemoteDataMapping customPropertyValueMapping = FindMappingByInternalId(projectId, customPropertyValue.Value, customPropertyValueMappings);
+                                                            SpiraImportExport.RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByInternalId(projectId, customPropertyValue.Value, customPropertyValueMappings);
                                                             if (customPropertyValueMapping != null)
                                                             {
                                                                 string externalCustomFieldValue = customPropertyValueMapping.ExternalKey;
-                                                                if (!String.IsNullOrEmpty(externalCustomFieldValue))
-                                                                {
-                                                                    //See which of the special bugzilla fields we have to populate
-                                                                    if (externalCustomField == BUGZILLA_SPECIAL_FIELD_COMPONENT)
-                                                                    {
-                                                                        //Now set the value of the component
-                                                                        component = externalCustomFieldValue;
-                                                                    }
-                                                                    if (externalCustomField == BUGZILLA_SPECIAL_FIELD_HARDWARE)
-                                                                    {
-                                                                        //Now set the value of the hardware platform
-                                                                        hardware = externalCustomFieldValue;
-                                                                    }
-                                                                    if (externalCustomField == BUGZILLA_SPECIAL_FIELD_OPERATING_SYSTEM)
-                                                                    {
-                                                                        //Now set the value of the operating system
-                                                                        operatingSystem = externalCustomFieldValue;
-                                                                    }
-                                                                }
+
+                                                                //This needs to be added to the list of external system custom properties
+                                                                customPropertyValues.Add(externalCustomField, externalCustomFieldValue);
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
+                                            LogTraceEvent(eventLog, "Finished with list custom property: " + customProperty.Alias + "\n", EventLogEntryType.Information);
                                         }
                                     }
                                 }
+                                LogTraceEvent(eventLog, "Captured incident custom values\n", EventLogEntryType.Information);
 
-                                //Now actually create the new bugzilla bug
-                                int bugzillaBugId = bugzilla.Create(
-                                    bugzillaProject,
-                                    component,
-                                    summary,
-                                    bugzillaVersion,
-                                    description,
-                                    operatingSystem,
-                                    hardware,
-                                    priority,
-                                    severity,
-                                    alias,
-                                    assignedto,
-                                    null,
-                                    "",
-                                    status,
-                                    ""
-                                    );
+                                /*
+                                 * TODO: Create the incident in the external system using the following values
+                                 *  - externalName
+                                 *  - externalDescription
+                                 *  - externalProjectId
+                                 *  - externalStatus
+                                 *  - externalType
+                                 *  - externalPriority
+                                 *  - externalSeverity
+                                 *  - externalReporter
+                                 *  - externalAssignee
+                                 *  - externalDetectedRelease
+                                 *  - externalResolvedRelease
+                                 *  
+                                 * We assume that the ID of the new bug generated is stored in externalBugId
+                                 */
+                                string externalBugId = "";  //TODO: Replace with the code to get the real exteral bug id
 
-                                //Add the bugzilla bug id to mappings table
+                                //Add the external bug id to mappings table
                                 SpiraImportExport.RemoteDataMapping newIncidentMapping = new SpiraImportExport.RemoteDataMapping();
                                 newIncidentMapping.ProjectId = projectId;
                                 newIncidentMapping.InternalId = incidentId;
-                                newIncidentMapping.ExternalKey = bugzillaBugId.ToString();
+                                newIncidentMapping.ExternalKey = externalBugId;
                                 newIncidentMappings.Add(newIncidentMapping);
 
-                                //See if we have any comments to add to bugzilla
+                                //We also add a link to the external issue from the Spira incident
+
+                                /*
+                                * TODO: Need to add the base URL onto the URL that we use to link the Spira incident to the external system
+                                */
+                                if (!String.IsNullOrEmpty(EXTERNAL_BUG_URL))
+                                {
+                                    string externalUrl = String.Format(EXTERNAL_BUG_URL, externalBugId);
+                                    SpiraImportExport.RemoteDocument remoteUrl = new SpiraImportExport.RemoteDocument();
+                                    remoteUrl.ArtifactId = incidentId;
+                                    remoteUrl.ArtifactTypeId = (int)Constants.ArtifactType.Incident;
+                                    remoteUrl.Description = "Link to issue in " + EXTERNAL_SYSTEM_NAME;
+                                    remoteUrl.FilenameOrUrl = externalUrl;
+                                    spiraImportExport.Document_AddUrl(remoteUrl);
+                                }
+
+                                //See if we have any comments to add to the external system
                                 RemoteIncidentResolution[] incidentResolutions = spiraImportExport.Incident_RetrieveResolutions(incidentId);
                                 if (incidentResolutions != null)
                                 {
                                     foreach (RemoteIncidentResolution incidentResolution in incidentResolutions)
                                     {
-                                        bugzilla.AddComment(bugzillaBugId, incidentResolution.Resolution, false);
+                                        string externalResolutionText = incidentResolution.Resolution;
+                                        DateTime creationDate = incidentResolution.CreationDate;
+
+                                        //Get the id of the corresponding external user that added the comments
+                                        string externalCommentAuthor = "";
+                                        dataMapping = InternalFunctions.FindMappingByInternalId(incidentResolution.CreatorId.Value, userMappings);
+                                        //If we can't find the user, just log a warning
+                                        if (dataMapping == null)
+                                        {
+                                            LogErrorEvent("Unable to locate mapping entry for user id " + incidentResolution.CreatorId.Value + " so using synchronization user", EventLogEntryType.Warning);
+                                        }
+                                        else
+                                        {
+                                            externalCommentAuthor = dataMapping.ExternalKey;
+                                        }
+
+                                        /*
+                                         * TODO: Add a comment to the external bug-tracking system using the following values
+                                         *  - externalResolutionText
+                                         *  - creationDate
+                                         *  - externalCommentAuthor
+                                         */
                                     }
                                 }
                             }
@@ -562,65 +607,103 @@ namespace SampleDataSync
                         catch (Exception exception)
                         {
                             //Log and continue execution
-                            eventLog.WriteEntry("Error Adding " + productName + " Incident to Bugzilla: " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
+                            LogErrorEvent("Error Adding " + productName + " Incident to " + EXTERNAL_SYSTEM_NAME +": " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
                         }
                     }
 
                     //Finally we need to update the mapping data on the server before starting the second phase
                     //of the data-synchronization
+                    //At this point we have potentially added incidents, added releases and removed releases
                     spiraImportExport.DataMapping_AddArtifactMappings(dataSyncSystemId, (int)Constants.ArtifactType.Incident, newIncidentMappings.ToArray());
+                    spiraImportExport.DataMapping_AddArtifactMappings(dataSyncSystemId, (int)Constants.ArtifactType.Release, newReleaseMappings.ToArray());
+                    spiraImportExport.DataMapping_RemoveArtifactMappings(dataSyncSystemId, (int)Constants.ArtifactType.Release, oldReleaseMappings.ToArray());
 
-                    //**** Next we need to see if any of the previously mapped incidents has changed or any new items added to Bugzilla ****
+                    //**** Next we need to see if any of the previously mapped incidents has changed or any new items added to the external system ****
                     incidentMappings = spiraImportExport.DataMapping_RetrieveArtifactMappings(dataSyncSystemId, (int)Constants.ArtifactType.Incident);
 
                     //Need to create a list to hold any new releases and new incidents
                     newIncidentMappings = new List<SpiraImportExport.RemoteDataMapping>();
-                    List<SpiraImportExport.RemoteDataMapping> newReleaseMappings = new List<SpiraImportExport.RemoteDataMapping>();
+                    newReleaseMappings = new List<SpiraImportExport.RemoteDataMapping>();
 
-                    //Call the Bugzilla API to get the list of recently added/changed bugs
+                    /*
+                     * TODO: Call the External System API to get the list of recently added/changed bugs
+                     * - i.e. bugs that have a last updated date >= filterDate and are in the appropriate project
+                     * We shall simply use a generic list of objects to simulate this
+                     */
+
                     DateTime filterDate = lastSyncDate.Value.AddHours(-timeOffsetHours);
                     if (filterDate < DateTime.Parse("1/1/1990"))
                     {
                         filterDate = DateTime.Parse("1/1/1990");
                     }
-                    List<Bug> bugzillaBugs = bugzilla.SearchByLastChangeTime(bugzillaProject, filterDate);
+                    List<object> externalSystemBugs = null; //TODO: Replace with real code to get bugs created since filterDate
 
                     //Iterate through these items
-                    foreach (Bug bugzillaBug in bugzillaBugs)
+                    foreach (object externalSystemBug in externalSystemBugs)
                     {
-                        //Make sure the projects match
-                        if (bugzillaBug.Product == bugzillaProject)
+                        //Extract the data from the external bug object
+
+                        /*
+                         * TODO: Need to add the code that actually gets the data from the external bug object
+                         */
+                        string externalBugId = "";
+                        string externalBugName = "";
+                        string externalBugDescription = "";
+                        string externalBugProjectId = "";
+                        string externalBugCreator = "";
+                        string externalBugPriority = "";
+                        string externalBugSeverity = "";
+                        string externalBugStatus = "";
+                        string externalBugType = "";
+                        string externalBugAssignee = "";
+                        string externalBugDetectedRelease = "";
+                        string externalBugResolvedRelease = "";
+                        DateTime? externalBugStartDate = null;
+                        DateTime? externalBugClosedDate = null;
+
+                        //Make sure the projects match (i.e. the external bug is in the project being synced)
+                        //It should be handled previously in the filter sent to external system, but use this as an extra check
+                        if (externalBugProjectId == externalProjectId)
                         {
                             //See if we have an existing mapping or not
-                            SpiraImportExport.RemoteDataMapping incidentMapping = FindMappingByExternalKey(projectId, bugzillaBug.Id.ToString(), incidentMappings, false);
+                            SpiraImportExport.RemoteDataMapping incidentMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugId, incidentMappings, false);
 
                             int incidentId = -1;
                             SpiraImportExport.RemoteIncident remoteIncident = null;
                             if (incidentMapping == null)
                             {
-                                //This case needs to be inserted into SpiraTest
+                                //This bug needs to be inserted into SpiraTest
                                 remoteIncident = new SpiraImportExport.RemoteIncident();
                                 remoteIncident.ProjectId = projectId;
 
-                                //Set the description for new incidents
-                                if (String.IsNullOrEmpty(bugzillaBug.Summary))
+                                //Set the name for new incidents
+                                if (String.IsNullOrEmpty(externalBugName))
                                 {
-                                    remoteIncident.Name = "Summary Not Specified";
-                                    remoteIncident.Description = "Summary Not Specified";
+                                    remoteIncident.Name = "Name Not Specified";
                                 }
                                 else
                                 {
-                                    remoteIncident.Description = bugzillaBug.Summary;
+                                    remoteIncident.Description = externalBugName;
+                                }
+
+                                //Set the description for new incidents
+                                if (String.IsNullOrEmpty(externalBugDescription))
+                                {
+                                    remoteIncident.Description = "Description Not Specified";
+                                }
+                                else
+                                {
+                                    remoteIncident.Description = externalBugDescription;
                                 }
 
                                 //Set the dectector for new incidents
-                                if (!String.IsNullOrEmpty(bugzillaBug.Creator))
+                                if (!String.IsNullOrEmpty(externalBugCreator))
                                 {
-                                    SpiraImportExport.RemoteDataMapping dataMapping = FindMappingByExternalKey(bugzillaBug.Creator, userMappings);
+                                    SpiraImportExport.RemoteDataMapping dataMapping = InternalFunctions.FindMappingByExternalKey(externalBugCreator, userMappings);
                                     if (dataMapping == null)
                                     {
                                         //We can't find the matching user so log and ignore
-                                        eventLog.WriteEntry("Unable to locate mapping entry for Bugzilla user " + bugzillaBug.Creator + " so using synchronization user as detector.", EventLogEntryType.Error);
+                                        LogErrorEvent("Unable to locate mapping entry for " + EXTERNAL_SYSTEM_NAME + " user " + externalBugCreator + " so using synchronization user as detector.", EventLogEntryType.Error);
                                     }
                                     else
                                     {
@@ -638,6 +721,19 @@ namespace SampleDataSync
                                 try
                                 {
                                     remoteIncident = spiraImportExport.Incident_RetrieveById(incidentId);
+
+
+                                    //Update the name for existing incidents
+                                    if (!String.IsNullOrEmpty(externalBugName))
+                                    {
+                                        remoteIncident.Description = externalBugName;
+                                    }
+
+                                    //Update the description for existing incidents
+                                    if (!String.IsNullOrEmpty(externalBugDescription))
+                                    {
+                                        remoteIncident.Description = externalBugDescription;
+                                    }
                                 }
                                 catch (Exception)
                                 {
@@ -651,29 +747,20 @@ namespace SampleDataSync
                                 if (remoteIncident != null)
                                 {
                                     RemoteDataMapping dataMapping;
-
-                                    //Debug logging - comment out for production code
                                     LogTraceEvent(eventLog, "Retrieved incident in " + productName + "\n", EventLogEntryType.Information);
 
-                                    //Update the incident with the text fields
-                                    if (!String.IsNullOrEmpty(bugzillaBug.Summary))
-                                    {
-                                        remoteIncident.Name = bugzillaBug.Summary;
-                                    }
-                                    LogTraceEvent(eventLog, "Got the name\n", EventLogEntryType.Information);
-
                                     //Now get the bug priority from the mapping (if priority is set)
-                                    if (String.IsNullOrEmpty(bugzillaBug.Priority))
+                                    if (String.IsNullOrEmpty(externalBugPriority))
                                     {
                                         remoteIncident.PriorityId = null;
                                     }
                                     else
                                     {
-                                        dataMapping = FindMappingByExternalKey(projectId, bugzillaBug.Priority, priorityMappings, true);
+                                        dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugPriority, priorityMappings, true);
                                         if (dataMapping == null)
                                         {
                                             //We can't find the matching item so log and just don't set the priority
-                                            eventLog.WriteEntry("Unable to locate mapping entry for bug priority " + bugzillaBug.Priority + " in project " + projectId, EventLogEntryType.Warning);
+                                            LogErrorEvent("Unable to locate mapping entry for " + EXTERNAL_SYSTEM_NAME + " bug priority " + externalBugPriority + " in project " + projectId, EventLogEntryType.Warning);
                                         }
                                         else
                                         {
@@ -683,17 +770,17 @@ namespace SampleDataSync
                                     LogTraceEvent(eventLog, "Got the priority\n", EventLogEntryType.Information);
 
                                     //Now get the bug severity from the mapping (if severity is set)
-                                    if (String.IsNullOrEmpty(bugzillaBug.BugSeverity))
+                                    if (String.IsNullOrEmpty(externalBugSeverity))
                                     {
                                         remoteIncident.SeverityId = null;
                                     }
                                     else
                                     {
-                                        dataMapping = FindMappingByExternalKey(projectId, bugzillaBug.BugSeverity, severityMappings, true);
+                                        dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugSeverity, severityMappings, true);
                                         if (dataMapping == null)
                                         {
                                             //We can't find the matching item so log and just don't set the severity
-                                            eventLog.WriteEntry("Unable to locate mapping entry for bug severity " + bugzillaBug.BugSeverity + " in project " + projectId, EventLogEntryType.Warning);
+                                            LogErrorEvent("Unable to locate mapping entry for " + EXTERNAL_SYSTEM_NAME + " bug severity " + externalBugSeverity + " in project " + projectId, EventLogEntryType.Warning);
                                         }
                                         else
                                         {
@@ -702,14 +789,14 @@ namespace SampleDataSync
                                     }
                                     LogTraceEvent(eventLog, "Got the severity\n", EventLogEntryType.Information);
 
-                                    //Now get the issue status from the mapping
-                                    if (!String.IsNullOrEmpty(bugzillaBug.BugStatus))
+                                    //Now get the bug status from the mapping
+                                    if (!String.IsNullOrEmpty(externalBugStatus))
                                     {
-                                        dataMapping = FindMappingByExternalKey(projectId, bugzillaBug.BugStatus, statusMappings, true);
+                                        dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugStatus, statusMappings, true);
                                         if (dataMapping == null)
                                         {
                                             //We can't find the matching item so log and ignore
-                                            eventLog.WriteEntry("Unable to locate mapping entry for bug status " + bugzillaBug.BugStatus + " in project " + projectId, EventLogEntryType.Error);
+                                            LogErrorEvent("Unable to locate mapping entry for " + EXTERNAL_SYSTEM_NAME + " bug status " + externalBugStatus + " in project " + projectId, EventLogEntryType.Error);
                                         }
                                         else
                                         {
@@ -717,15 +804,36 @@ namespace SampleDataSync
                                         }
                                     }
 
-                                    //Debug logging - comment out for production code
                                     LogTraceEvent(eventLog, "Got the status\n", EventLogEntryType.Information);
 
-                                    //Now update the bug's owner in SpiraTest
-                                    dataMapping = FindMappingByExternalKey(bugzillaBug.AssignedTo, userMappings);
+                                    //Now get the bug type from the mapping
+                                    if (!String.IsNullOrEmpty(externalBugType))
+                                    {
+                                        dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugType, typeMappings, true);
+                                        if (dataMapping == null)
+                                        {
+                                            //If this is a new issue and we don't have the type mapped
+                                            //it means that they don't want them getting added to SpiraTest
+                                            if (incidentId == -1)
+                                            {
+                                                continue;
+                                            }
+                                            //We can't find the matching item so log and ignore
+                                            eventLog.WriteEntry("Unable to locate mapping entry for " + EXTERNAL_SYSTEM_NAME + " incident type " + externalBugType + " in project " + projectId, EventLogEntryType.Error);
+                                        }
+                                        else
+                                        {
+                                            remoteIncident.IncidentTypeId = dataMapping.InternalId;
+                                        }
+                                    }
+                                    LogTraceEvent(eventLog, "Got the type\n", EventLogEntryType.Information);
+
+                                    //Now update the bug's owner/assignee in SpiraTest
+                                    dataMapping = InternalFunctions.FindMappingByExternalKey(externalBugAssignee, userMappings);
                                     if (dataMapping == null)
                                     {
                                         //We can't find the matching user so log and ignore
-                                        eventLog.WriteEntry("Unable to locate mapping entry for Bugzilla user " + bugzillaBug.AssignedTo + " so ignoring the assignee change", EventLogEntryType.Error);
+                                        LogErrorEvent("Unable to locate mapping entry for " + EXTERNAL_SYSTEM_NAME + " user " + externalBugAssignee + " so ignoring the assignee change", EventLogEntryType.Error);
                                     }
                                     else
                                     {
@@ -733,8 +841,25 @@ namespace SampleDataSync
                                         LogTraceEvent(eventLog, "Got the assignee " + remoteIncident.OwnerId.ToString() + "\n", EventLogEntryType.Information);
                                     }
 
-                                    //Now we need to get all the comments attached to the bug in Bugzilla
-                                    List<Comment> bugzillaComments = bugzilla.Comments(bugzillaBug.Id);
+                                    //Update the start-date if necessary
+                                    if (externalBugStartDate.HasValue)
+                                    {
+                                        remoteIncident.StartDate = externalBugStartDate.Value;
+                                    }
+
+                                    //Update the closed-date if necessary
+                                    if (externalBugClosedDate.HasValue)
+                                    {
+                                        remoteIncident.ClosedDate = externalBugClosedDate.Value;
+                                    }
+
+                                    //Now we need to get all the comments attached to the bug in the external system
+                                    /*
+                                     * TODO: Add the code to get all the comments associated with the external bug using:
+                                     *  - externalBugId
+                                     */
+
+                                    List<object> externalBugComments = null;    //TODO: Replace with real code
 
                                     //Now get the list of comments attached to the SpiraTest incident
                                     //If this is the new incident case, just leave as null
@@ -746,17 +871,27 @@ namespace SampleDataSync
 
                                     //Iterate through all the comments and see if we need to add any to SpiraTest
                                     List<SpiraImportExport.RemoteIncidentResolution> newIncidentResolutions = new List<SpiraImportExport.RemoteIncidentResolution>();
-                                    if (bugzillaComments != null)
+                                    if (externalBugComments != null)
                                     {
-                                        foreach (Comment bugzillaComment in bugzillaComments)
+                                        foreach (object externalBugComment in externalBugComments)
                                         {
+                                            /*
+                                             * TODO: Replace the following sample code with the code that will extract the information
+                                             *       from the real externalBugComment object
+                                             */
+
+                                            //Extract the resolution values from the external system
+                                            string externalCommentText = "";
+                                            string externalCommentCreator = "";
+                                            DateTime? externalCommentCreationDate = null;
+
                                             //See if we already have this resolution inside SpiraTest
                                             bool alreadyAdded = false;
                                             if (incidentResolutions != null)
                                             {
                                                 foreach (SpiraImportExport.RemoteIncidentResolution incidentResolution in incidentResolutions)
                                                 {
-                                                    if (incidentResolution.Resolution == bugzillaComment.Text)
+                                                    if (incidentResolution.Resolution.Trim() == externalCommentText.Trim())
                                                     {
                                                         alreadyAdded = true;
                                                     }
@@ -765,8 +900,8 @@ namespace SampleDataSync
                                             if (!alreadyAdded)
                                             {
                                                 //Get the resolution author mapping
-                                                LogTraceEvent(eventLog, "Looking for comments creator: '" + bugzillaComment.Creator + "'\n", EventLogEntryType.Information);
-                                                dataMapping = FindMappingByExternalKey(bugzillaComment.Creator, userMappings);
+                                                LogTraceEvent(eventLog, "Looking for " + EXTERNAL_SYSTEM_NAME + " comments creator: '" + externalCommentCreator + "'\n", EventLogEntryType.Information);
+                                                dataMapping = InternalFunctions.FindMappingByExternalKey(externalCommentCreator, userMappings);
                                                 int? creatorId = null;
                                                 if (dataMapping != null)
                                                 {
@@ -779,8 +914,8 @@ namespace SampleDataSync
                                                 SpiraImportExport.RemoteIncidentResolution newIncidentResolution = new SpiraImportExport.RemoteIncidentResolution();
                                                 newIncidentResolution.IncidentId = incidentId;
                                                 newIncidentResolution.CreatorId = creatorId;
-                                                newIncidentResolution.CreationDate = bugzillaComment.Time;
-                                                newIncidentResolution.Resolution = bugzillaComment.Text;
+                                                newIncidentResolution.CreationDate = (externalCommentCreationDate.HasValue) ? externalCommentCreationDate.Value : DateTime.Now;
+                                                newIncidentResolution.Resolution = externalCommentText;
                                                 newIncidentResolutions.Add(newIncidentResolution);
                                             }
                                         }
@@ -791,32 +926,44 @@ namespace SampleDataSync
                                     LogTraceEvent(eventLog, "Got the comments/resolution\n", EventLogEntryType.Information);
 
                                     //Specify the detected-in release if applicable
-                                    if (!String.IsNullOrWhiteSpace(bugzillaBug.Version))
+                                    if (!String.IsNullOrEmpty(externalBugDetectedRelease))
                                     {
                                         //See if we have a mapped SpiraTest release in either the existing list of
                                         //mapped releases or the list of newly added ones
-                                        dataMapping = FindMappingByExternalKey(projectId, bugzillaBug.Version, releaseMappings, false);
+                                        dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugDetectedRelease, releaseMappings, false);
                                         if (dataMapping == null)
                                         {
-                                            dataMapping = FindMappingByExternalKey(projectId, bugzillaBug.Version, newReleaseMappings.ToArray(), false);
+                                            dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugDetectedRelease, newReleaseMappings.ToArray(), false);
                                         }
                                         if (dataMapping == null)
                                         {
                                             //We can't find the matching item so need to create a new release in SpiraTest and add to mappings
-                                            LogTraceEvent(eventLog, "Adding new release in " + productName + " for version " + bugzillaBug.Version + "\n", EventLogEntryType.Information);
+
+                                            /*
+                                             * TODO: Add code to retrieve the release/version in the external system (if necessary) and extract the properties
+                                             *       into the following temporary variables
+                                             */
+                                            string externalReleaseName = "";
+                                            string externalReleaseVersionNumber = "";
+                                            DateTime? externalReleaseStartDate = null;
+                                            DateTime? externalReleaseEndDate = null;
+
+                                            LogTraceEvent(eventLog, "Adding new release in " + productName + " for version " + externalBugDetectedRelease + "\n", EventLogEntryType.Information);
                                             SpiraImportExport.RemoteRelease remoteRelease = new SpiraImportExport.RemoteRelease();
-                                            remoteRelease.Name = bugzillaBug.Version;
-                                            if (bugzillaBug.Version.Length > 10)
+                                            remoteRelease.Name = externalReleaseName;
+                                            if (externalReleaseVersionNumber.Length > 10)
                                             {
-                                                remoteRelease.VersionNumber = bugzillaBug.Version.Substring(0, 10);
+                                                remoteRelease.VersionNumber = externalReleaseVersionNumber.Substring(0, 10);
                                             }
                                             else
                                             {
-                                                remoteRelease.VersionNumber = bugzillaBug.Version;
+                                                remoteRelease.VersionNumber = externalReleaseVersionNumber;
                                             }
                                             remoteRelease.Active = true;
-                                            remoteRelease.StartDate = DateTime.Now.Date;
-                                            remoteRelease.EndDate = DateTime.Now.Date.AddDays(5);
+                                            //If no start-date specified, simply use now
+                                            remoteRelease.StartDate = (externalReleaseStartDate.HasValue) ? externalReleaseStartDate.Value : DateTime.Now;
+                                            //If no end-date specified, simply use 1-month from now
+                                            remoteRelease.EndDate = (externalReleaseEndDate.HasValue) ? externalReleaseEndDate.Value : DateTime.Now.AddMonths(1);
                                             remoteRelease.CreatorId = remoteIncident.OpenerId;
                                             remoteRelease.CreationDate = DateTime.Now;
                                             remoteRelease.ResourceCount = 1;
@@ -827,7 +974,7 @@ namespace SampleDataSync
                                             SpiraImportExport.RemoteDataMapping newReleaseMapping = new SpiraImportExport.RemoteDataMapping();
                                             newReleaseMapping.ProjectId = projectId;
                                             newReleaseMapping.InternalId = remoteRelease.ReleaseId.Value;
-                                            newReleaseMapping.ExternalKey = bugzillaBug.Version;
+                                            newReleaseMapping.ExternalKey = externalBugDetectedRelease;
                                             newReleaseMappings.Add(newReleaseMapping);
                                             remoteIncident.DetectedReleaseId = newReleaseMapping.InternalId;
                                             LogTraceEvent(eventLog, "Setting detected release id to  " + newReleaseMapping.InternalId + "\n", EventLogEntryType.SuccessAudit);
@@ -839,54 +986,129 @@ namespace SampleDataSync
                                         }
                                     }
 
-                                    //See if we have bugzilla resolution value
-                                    if (!String.IsNullOrEmpty(bugzillaBug.Resolution))
+                                    //Specify the resolved-in release if applicable
+                                    if (!String.IsNullOrEmpty(externalBugResolvedRelease))
                                     {
-                                        //Now iterate through the project custom properties to populate the special bugzilla fields
-                                        //Currently that's only the special Resolution field used to capture the Bugzilla resolution
-                                        if (!String.IsNullOrEmpty(bugzillaBug.Resolution))
+                                        //See if we have a mapped SpiraTest release in either the existing list of
+                                        //mapped releases or the list of newly added ones
+                                        dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugResolvedRelease, releaseMappings, false);
+                                        if (dataMapping == null)
                                         {
-                                            foreach (SpiraImportExport.RemoteCustomProperty customProperty in projectCustomProperties)
+                                            dataMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalBugResolvedRelease, newReleaseMappings.ToArray(), false);
+                                        }
+                                        if (dataMapping == null)
+                                        {
+                                            //We can't find the matching item so need to create a new release in SpiraTest and add to mappings
+
+                                            /*
+                                             * TODO: Add code to retrieve the release/version in the external system (if necessary) and extract the properties
+                                             *       into the following temporary variables
+                                             */
+                                            string externalReleaseName = "";
+                                            string externalReleaseVersionNumber = "";
+                                            DateTime? externalReleaseStartDate = null;
+                                            DateTime? externalReleaseEndDate = null;
+
+                                            LogTraceEvent(eventLog, "Adding new release in " + productName + " for version " + externalBugResolvedRelease + "\n", EventLogEntryType.Information);
+                                            SpiraImportExport.RemoteRelease remoteRelease = new SpiraImportExport.RemoteRelease();
+                                            remoteRelease.Name = externalReleaseName;
+                                            if (externalReleaseVersionNumber.Length > 10)
                                             {
-                                                //This is a text field
-                                                if (customProperty.CustomPropertyTypeId == CUSTOM_PROPERTY_TYPE_TEXT && customProperty.Alias == BUGZILLA_SPECIAL_FIELD_RESOLUTION)
+                                                remoteRelease.VersionNumber = externalReleaseVersionNumber.Substring(0, 10);
+                                            }
+                                            else
+                                            {
+                                                remoteRelease.VersionNumber = externalReleaseVersionNumber;
+                                            }
+                                            remoteRelease.Active = true;
+                                            //If no start-date specified, simply use now
+                                            remoteRelease.StartDate = (externalReleaseStartDate.HasValue) ? externalReleaseStartDate.Value : DateTime.Now;
+                                            //If no end-date specified, simply use 1-month from now
+                                            remoteRelease.EndDate = (externalReleaseEndDate.HasValue) ? externalReleaseEndDate.Value : DateTime.Now.AddMonths(1);
+                                            remoteRelease.CreatorId = remoteIncident.OpenerId;
+                                            remoteRelease.CreationDate = DateTime.Now;
+                                            remoteRelease.ResourceCount = 1;
+                                            remoteRelease.DaysNonWorking = 0;
+                                            remoteRelease = spiraImportExport.Release_Create(remoteRelease, null);
+
+                                            //Add a new mapping entry
+                                            SpiraImportExport.RemoteDataMapping newReleaseMapping = new SpiraImportExport.RemoteDataMapping();
+                                            newReleaseMapping.ProjectId = projectId;
+                                            newReleaseMapping.InternalId = remoteRelease.ReleaseId.Value;
+                                            newReleaseMapping.ExternalKey = externalBugResolvedRelease;
+                                            newReleaseMappings.Add(newReleaseMapping);
+                                            remoteIncident.ResolvedReleaseId = newReleaseMapping.InternalId;
+                                            LogTraceEvent(eventLog, "Setting resolved release id to  " + newReleaseMapping.InternalId + "\n", EventLogEntryType.SuccessAudit);
+                                        }
+                                        else
+                                        {
+                                            remoteIncident.ResolvedReleaseId = dataMapping.InternalId;
+                                            LogTraceEvent(eventLog, "Setting resolved release id to  " + dataMapping.InternalId + "\n", EventLogEntryType.SuccessAudit);
+                                        }
+                                    }
+
+                                    /*
+                                     * TODO: Need to get the list of custom property values for the bug from the external system.
+                                     * The following sample code just stores them in a simple text dictionary
+                                     * where the Key=Field Name, Value=Field Value
+                                     */
+                                    Dictionary<string, string> externalSystemCustomFieldValues = null;  //TODO: Replace with real code
+
+                                    //Now we need to see if any of the custom properties have changed
+                                    foreach (SpiraImportExport.RemoteCustomProperty customProperty in projectCustomProperties)
+                                    {
+                                        //Get the external key of this custom property
+                                        if (customPropertyMappingList.ContainsKey(customProperty.CustomPropertyId))
+                                        {
+                                            SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId];
+                                            if (customPropertyDataMapping != null)
+                                            {
+                                                string externalKey = customPropertyDataMapping.ExternalKey;
+                                                //First the text fields
+                                                if (customProperty.CustomPropertyTypeId == (int)Constants.CustomPropertyType.Text)
                                                 {
                                                     //Now we need to set the value on the SpiraTest incident
-                                                    SetCustomPropertyTextValue(remoteIncident, customProperty.CustomPropertyName, bugzillaBug.Resolution);
+                                                    foreach (KeyValuePair<string, string> externalSystemCustomFieldKVP in externalSystemCustomFieldValues)
+                                                    {
+                                                        string externalCustomFieldName = externalSystemCustomFieldKVP.Key;
+                                                        string externalCustomFieldValue = externalSystemCustomFieldKVP.Value;
+                                                        if (externalCustomFieldName == externalKey)
+                                                        {
+                                                            InternalFunctions.SetCustomPropertyTextValue(remoteIncident, customProperty.CustomPropertyName, externalCustomFieldValue);
+                                                        }
+                                                    }
+                                                }
+
+                                                //Next the list fields
+                                                if (customProperty.CustomPropertyTypeId == (int)Constants.CustomPropertyType.List)
+                                                {
+                                                    //Now we need to set the value on the SpiraTest incident
+                                                    foreach (KeyValuePair<string, string> externalSystemCustomFieldKVP in externalSystemCustomFieldValues)
+                                                    {
+                                                        string externalCustomFieldName = externalSystemCustomFieldKVP.Key;
+                                                        string externalCustomFieldValue = externalSystemCustomFieldKVP.Value;
+                                                        if (externalCustomFieldName == externalKey)
+                                                        {
+                                                            if (String.IsNullOrEmpty(externalCustomFieldValue))
+                                                            {
+                                                                InternalFunctions.SetCustomPropertyListValue(remoteIncident, customProperty.CustomPropertyName, null);
+                                                            }
+                                                            else
+                                                            {
+                                                                //Now we need to use data-mapping to get the SpiraTest equivalent custom property value
+                                                                SpiraImportExport.RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId];
+                                                                SpiraImportExport.RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByExternalKey(projectId, externalCustomFieldValue, customPropertyValueMappings, false);
+                                                                if (customPropertyValueMapping != null)
+                                                                {
+                                                                    InternalFunctions.SetCustomPropertyListValue(remoteIncident, customProperty.CustomPropertyName, customPropertyValueMapping.InternalId);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-
-                                    //Debug logging - comment out for production code
-                                    LogTraceEvent(eventLog, "Got the resolution\n", EventLogEntryType.Information);
-
-                                    //See if we have bugzilla OS value
-                                    if (!String.IsNullOrEmpty(bugzillaBug.OpSys))
-                                    {
-                                        SetListCustomPropertyMappedValue(projectCustomProperties, customPropertyMappingList, customPropertyValueMappingList, BUGZILLA_SPECIAL_FIELD_OPERATING_SYSTEM, remoteIncident, bugzillaBug.OpSys, projectId);
-                                    }
-
-                                    //Debug logging - comment out for production code
-                                    LogTraceEvent(eventLog, "Got the OS\n", EventLogEntryType.Information);
-
-                                    //See if we have bugzilla Hardware/Platform value
-                                    if (!String.IsNullOrEmpty(bugzillaBug.RepPlatform))
-                                    {
-                                        SetListCustomPropertyMappedValue(projectCustomProperties, customPropertyMappingList, customPropertyValueMappingList, BUGZILLA_SPECIAL_FIELD_HARDWARE, remoteIncident, bugzillaBug.RepPlatform, projectId);
-                                    }
-
-                                    //Debug logging - comment out for production code
-                                    LogTraceEvent(eventLog, "Got the Hardware\n", EventLogEntryType.Information);
-
-                                    //See if we have a bugzilla Component value
-                                    if (!String.IsNullOrEmpty(bugzillaBug.Component))
-                                    {
-                                        SetListCustomPropertyMappedValue(projectCustomProperties, customPropertyMappingList, customPropertyValueMappingList, BUGZILLA_SPECIAL_FIELD_COMPONENT, remoteIncident, bugzillaBug.Component, projectId);
-                                    }
-
-                                    //Debug logging - comment out for production code
-                                    LogTraceEvent(eventLog, "Got the Component\n", EventLogEntryType.Information);
 
                                     //Finally add or update the incident in SpiraTest
                                     if (incidentId == -1)
@@ -898,19 +1120,19 @@ namespace SampleDataSync
                                         }
                                         catch (Exception exception)
                                         {
-                                            eventLog.WriteEntry("Error Adding Bugzilla bug " + bugzillaBug.Id + " to " + productName + " (" + exception.Message + ")\n" + exception.StackTrace, EventLogEntryType.Error);
+                                            LogErrorEvent("Error Adding " + EXTERNAL_SYSTEM_NAME + " bug " + externalBugId + " to " + productName + " (" + exception.Message + ")\n" + exception.StackTrace, EventLogEntryType.Error);
                                             continue;
                                         }
-                                        LogTraceEvent(eventLog, "Successfully added Bugzilla bug " + bugzillaBug.Id + " to " + productName + "\n", EventLogEntryType.Information);
+                                        LogTraceEvent(eventLog, "Successfully added " + EXTERNAL_SYSTEM_NAME + " bug " + externalBugId + " to " + productName + "\n", EventLogEntryType.Information);
 
                                         //Extract the SpiraTest incident and add to mappings table
                                         SpiraImportExport.RemoteDataMapping newIncidentMapping = new SpiraImportExport.RemoteDataMapping();
                                         newIncidentMapping.ProjectId = projectId;
                                         newIncidentMapping.InternalId = remoteIncident.IncidentId.Value;
-                                        newIncidentMapping.ExternalKey = bugzillaBug.Id.ToString();
+                                        newIncidentMapping.ExternalKey = externalBugId;
                                         newIncidentMappings.Add(newIncidentMapping);
 
-                                        //Now add any resolutions (need to set the ID)
+                                        //Now add any comments (need to set the ID)
                                         foreach (SpiraImportExport.RemoteIncidentResolution newResolution in newIncidentResolutions)
                                         {
                                             newResolution.IncidentId = remoteIncident.IncidentId.Value;
@@ -933,7 +1155,7 @@ namespace SampleDataSync
                             catch (Exception exception)
                             {
                                 //Log and continue execution
-                                eventLog.WriteEntry("Error Inserting/Updating Bugzilla Bug in " + productName + ": " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
+                                LogErrorEvent("Error Inserting/Updating " + EXTERNAL_SYSTEM_NAME + " Bug in " + productName + ": " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
                             }
                         }
                     }
@@ -949,7 +1171,10 @@ namespace SampleDataSync
 
                 //Mark objects ready for garbage collection
                 spiraImportExport = null;
-                bugzilla = null;
+                
+                /*
+                 * TODO: Set to null any objects releated to the external system, call Dispose() if they implement IDisposable
+                 */
 
                 //Let the service know that we ran correctly
                 return ServiceReturnType.Success;
@@ -957,7 +1182,7 @@ namespace SampleDataSync
             catch (Exception exception)
             {
                 //Log the exception and return as a failure
-                eventLog.WriteEntry("General Error: " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
+                LogErrorEvent("General Error: " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
                 return ServiceReturnType.Error;
             }
         }
@@ -968,11 +1193,68 @@ namespace SampleDataSync
         /// <param name="eventLog">The event log handle</param>
         /// <param name="message">The message to log</param>
         /// <param name="type">The type of event</param>
-        protected void LogTraceEvent(EventLog eventLog, string message, EventLogEntryType type)
+        protected void LogTraceEvent(EventLog eventLog, string message, EventLogEntryType type = EventLogEntryType.Information)
         {
-            if (traceLogging)
+            if (traceLogging && eventLog != null)
             {
-                eventLog.WriteEntry(message, type);
+                if (message.Length > 32700)
+                {
+                    //Split into smaller lengths
+                    int index = 0;
+                    while (index < message.Length)
+                    {
+                        try
+                        {
+                            string messageElement = message.Substring(index, 32700);
+                            this.eventLog.WriteEntry(messageElement, type);
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            string messageElement = message.Substring(index);
+                            this.eventLog.WriteEntry(messageElement, type);
+                        }
+                        index += 32700;
+                    }
+                }
+                else
+                {
+                    this.eventLog.WriteEntry(message, type);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Logs a trace event message if the configuration option is set
+        /// </summary>
+        /// <param name="message">The message to log</param>
+        /// <param name="type">The type of event</param>
+        public void LogErrorEvent(string message, EventLogEntryType type = EventLogEntryType.Error)
+        {
+            if (this.eventLog != null)
+            {
+                if (message.Length > 32700)
+                {
+                    //Split into smaller lengths
+                    int index = 0;
+                    while (index < message.Length)
+                    {
+                        try
+                        {
+                            string messageElement = message.Substring(index, 32700);
+                            this.eventLog.WriteEntry(messageElement, type);
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            string messageElement = message.Substring(index);
+                            this.eventLog.WriteEntry(messageElement, type);
+                        }
+                        index += 32700;
+                    }
+                }
+                else
+                {
+                    this.eventLog.WriteEntry(message, type);
+                }
             }
         }
 

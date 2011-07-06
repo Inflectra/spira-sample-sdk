@@ -92,6 +92,210 @@ namespace SampleDataSync
         }
 
         /// <summary>
+        /// Extracts the matching custom property text value from an artifact
+        /// </summary>
+        /// <param name="remoteArtifact">The artifact</param>
+        /// <param name="customPropertyName">The name of the custom property</param>
+        /// <returns></returns>
+        public static String GetCustomPropertyTextValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName)
+        {
+            if (customPropertyName == "TEXT_01")
+            {
+                return remoteArtifact.Text01;
+            }
+            if (customPropertyName == "TEXT_02")
+            {
+                return remoteArtifact.Text02;
+            }
+            if (customPropertyName == "TEXT_03")
+            {
+                return remoteArtifact.Text03;
+            }
+            if (customPropertyName == "TEXT_04")
+            {
+                return remoteArtifact.Text04;
+            }
+            if (customPropertyName == "TEXT_05")
+            {
+                return remoteArtifact.Text05;
+            }
+            if (customPropertyName == "TEXT_06")
+            {
+                return remoteArtifact.Text06;
+            }
+            if (customPropertyName == "TEXT_07")
+            {
+                return remoteArtifact.Text07;
+            }
+            if (customPropertyName == "TEXT_08")
+            {
+                return remoteArtifact.Text08;
+            }
+            if (customPropertyName == "TEXT_09")
+            {
+                return remoteArtifact.Text09;
+            }
+            if (customPropertyName == "TEXT_10")
+            {
+                return remoteArtifact.Text10;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Extracts the matching custom property list value from an artifact
+        /// </summary>
+        /// <param name="remoteArtifact">The artifact</param>
+        /// <param name="customPropertyName">The name of the custom property</param>
+        /// <returns></returns>
+        public static Nullable<int> GetCustomPropertyListValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName)
+        {
+            if (customPropertyName == "LIST_01")
+            {
+                return remoteArtifact.List01;
+            }
+            if (customPropertyName == "LIST_02")
+            {
+                return remoteArtifact.List02;
+            }
+            if (customPropertyName == "LIST_03")
+            {
+                return remoteArtifact.List03;
+            }
+            if (customPropertyName == "LIST_04")
+            {
+                return remoteArtifact.List04;
+            }
+            if (customPropertyName == "LIST_05")
+            {
+                return remoteArtifact.List05;
+            }
+            if (customPropertyName == "LIST_06")
+            {
+                return remoteArtifact.List06;
+            }
+            if (customPropertyName == "LIST_07")
+            {
+                return remoteArtifact.List07;
+            }
+            if (customPropertyName == "LIST_08")
+            {
+                return remoteArtifact.List08;
+            }
+            if (customPropertyName == "LIST_09")
+            {
+                return remoteArtifact.List09;
+            }
+            if (customPropertyName == "LIST_10")
+            {
+                return remoteArtifact.List10;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Sets the matching custom property text value on an artifact
+        /// </summary>
+        /// <param name="remoteArtifact">The artifact</param>
+        /// <param name="customPropertyName">The name of the custom property</param>
+        /// <param name="value">The value to set</param>
+        /// <returns></returns>
+        public static void SetCustomPropertyTextValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName, string value)
+        {
+            if (customPropertyName == "TEXT_01")
+            {
+                remoteArtifact.Text01 = value;
+            }
+            if (customPropertyName == "TEXT_02")
+            {
+                remoteArtifact.Text02 = value;
+            }
+            if (customPropertyName == "TEXT_03")
+            {
+                remoteArtifact.Text03 = value;
+            }
+            if (customPropertyName == "TEXT_04")
+            {
+                remoteArtifact.Text04 = value;
+            }
+            if (customPropertyName == "TEXT_05")
+            {
+                remoteArtifact.Text05 = value;
+            }
+            if (customPropertyName == "TEXT_06")
+            {
+                remoteArtifact.Text06 = value;
+            }
+            if (customPropertyName == "TEXT_07")
+            {
+                remoteArtifact.Text07 = value;
+            }
+            if (customPropertyName == "TEXT_08")
+            {
+                remoteArtifact.Text08 = value;
+            }
+            if (customPropertyName == "TEXT_09")
+            {
+                remoteArtifact.Text09 = value;
+            }
+            if (customPropertyName == "TEXT_10")
+            {
+                remoteArtifact.Text10 = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets the matching custom property list value on an artifact
+        /// </summary>
+        /// <param name="remoteArtifact">The artifact</param>
+        /// <param name="customPropertyName">The name of the custom property</param>
+        /// <param name="value">The value to set</param>
+        /// <returns></returns>
+        public static void SetCustomPropertyListValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName, Nullable<int> value)
+        {
+            if (customPropertyName == "LIST_01")
+            {
+                remoteArtifact.List01 = value;
+            }
+            if (customPropertyName == "LIST_02")
+            {
+                remoteArtifact.List02 = value;
+            }
+            if (customPropertyName == "LIST_03")
+            {
+                remoteArtifact.List03 = value;
+            }
+            if (customPropertyName == "LIST_04")
+            {
+                remoteArtifact.List04 = value;
+            }
+            if (customPropertyName == "LIST_05")
+            {
+                remoteArtifact.List05 = value;
+            }
+            if (customPropertyName == "LIST_06")
+            {
+                remoteArtifact.List06 = value;
+            }
+            if (customPropertyName == "LIST_07")
+            {
+                remoteArtifact.List07 = value;
+            }
+            if (customPropertyName == "LIST_08")
+            {
+                remoteArtifact.List08 = value;
+            }
+            if (customPropertyName == "LIST_09")
+            {
+                remoteArtifact.List09 = value;
+            }
+            if (customPropertyName == "LIST_10")
+            {
+                remoteArtifact.List10 = value;
+            }
+        }
+
+        /// <summary>
         /// Renders HTML content as plain text, since JIRA cannot handle tags
         /// </summary>
         /// <param name="source">The HTML markup</param>
