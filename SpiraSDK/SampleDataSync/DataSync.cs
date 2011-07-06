@@ -1197,7 +1197,7 @@ namespace SampleDataSync
         {
             if (traceLogging && eventLog != null)
             {
-                if (message.Length > 32700)
+                if (message.Length > 31000)
                 {
                     //Split into smaller lengths
                     int index = 0;
@@ -1205,7 +1205,7 @@ namespace SampleDataSync
                     {
                         try
                         {
-                            string messageElement = message.Substring(index, 32700);
+                            string messageElement = message.Substring(index, 31000);
                             this.eventLog.WriteEntry(messageElement, type);
                         }
                         catch (ArgumentOutOfRangeException)
@@ -1213,7 +1213,7 @@ namespace SampleDataSync
                             string messageElement = message.Substring(index);
                             this.eventLog.WriteEntry(messageElement, type);
                         }
-                        index += 32700;
+                        index += 31000;
                     }
                 }
                 else
@@ -1232,7 +1232,7 @@ namespace SampleDataSync
         {
             if (this.eventLog != null)
             {
-                if (message.Length > 32700)
+                if (message.Length > 31000)
                 {
                     //Split into smaller lengths
                     int index = 0;
@@ -1240,7 +1240,7 @@ namespace SampleDataSync
                     {
                         try
                         {
-                            string messageElement = message.Substring(index, 32700);
+                            string messageElement = message.Substring(index, 31000);
                             this.eventLog.WriteEntry(messageElement, type);
                         }
                         catch (ArgumentOutOfRangeException)
@@ -1248,7 +1248,7 @@ namespace SampleDataSync
                             string messageElement = message.Substring(index);
                             this.eventLog.WriteEntry(messageElement, type);
                         }
-                        index += 32700;
+                        index += 31000;
                     }
                 }
                 else
