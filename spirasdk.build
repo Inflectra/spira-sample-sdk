@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="Spira SDK" default="zipup">
+	<target name="zipup" description="Zips up the whole SDK for deployment">
+		<echo message="Zipping up entire application" />
+		<zip zipfile="SpiraSDK.zip" verbose="true" comment="Software Development Kit for SpiraTest/Plan/Team">
+			<fileset>
+				<include name="**/*.cs" />
+				<include name="**/*.csproj" />
+				<include name="**/*.sln" />
+				<include name="**/*.xaml" />
+				<include name="**/app.config" />
+				<include name="**/*.datasource" />
+				<include name="**/*.disco" />
+				<include name="**/*.wsdl" />
+				<include name="**/*.svcmap" />
+				<include name="**/*.svcinfo" />
+				<include name="Assemblies/*.dll" />				
+			</fileset>
+		</zip>
+	</target>	
+</project>
