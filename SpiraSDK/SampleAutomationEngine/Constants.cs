@@ -19,5 +19,10 @@ namespace SampleAutomationEngine
         /// The version number of the plugin.
         /// </summary>
         public const string AUTOMATION_ENGINE_VERSION = "1.0.0";    //TODO: Change to match your version numbering scheme.
+
+        /// <summary>
+        /// The name of external automated testing system
+        /// </summary>
+        public const string EXTERNAL_SYSTEM_NAME = "SampleSystem";  //TODO: Change to match the name of the system being integrated with
     }
 }

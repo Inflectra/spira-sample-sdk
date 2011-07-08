@@ -38,12 +38,12 @@ namespace SampleAutomationEngine.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Setting3 {
+        public bool TraceLogging {
             get {
-                return ((bool)(this["Setting3"]));
+                return ((bool)(this["TraceLogging"]));
             }
             set {
-                this["Setting3"] = value;
+                this["TraceLogging"] = value;
             }
         }
         

@@ -39,7 +39,7 @@ namespace SampleAutomationEngine
             //Load the various properties
             this.txtSetting1.Text = Properties.Settings.Default.Setting1;
             this.txtSetting2.Text = Properties.Settings.Default.Setting2;
-            this.chkSetting3.IsChecked = Properties.Settings.Default.Setting3;
+            this.chkTraceLogging.IsChecked = Properties.Settings.Default.TraceLogging;
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace SampleAutomationEngine
             //Get the various properties
             Properties.Settings.Default.Setting1 = this.txtSetting1.Text.Trim();
             Properties.Settings.Default.Setting2 = this.txtSetting2.Text.Trim();
-            if (this.chkSetting3.IsChecked.HasValue)
+            if (this.chkTraceLogging.IsChecked.HasValue)
             {
-                Properties.Settings.Default.Setting3 = this.chkSetting3.IsChecked.Value;
+                Properties.Settings.Default.TraceLogging = this.chkTraceLogging.IsChecked.Value;
             }
 
             //Save the properties and reload
