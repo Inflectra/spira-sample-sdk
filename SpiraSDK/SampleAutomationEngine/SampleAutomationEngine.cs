@@ -136,6 +136,37 @@ namespace SampleAutomationEngine
                  * TODO: Instantiate the code/API used to access the external testing system
                  */
 
+                //See if we have any parameters we need to pass to the automation engine
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                if (automatedTestRun.Parameters == null)
+                {
+                    if (Properties.Settings.Default.TraceLogging)
+                    {
+                        LogEvent("Test Run has no parameters", EventLogEntryType.Information);
+                    }
+                }
+                else
+                {
+                    if (Properties.Settings.Default.TraceLogging)
+                    {
+                        LogEvent("Test Run has parameters", EventLogEntryType.Information);
+                    }
+
+                    foreach (TestRunParameter testRunParameter in automatedTestRun.Parameters)
+                    {
+                        string parameterName = testRunParameter.Name.ToLowerInvariant();
+                        if (!parameters.ContainsKey(parameterName))
+                        {
+                            //Make sure the parameters are lower case
+                            if (Properties.Settings.Default.TraceLogging)
+                            {
+                                LogEvent("Adding test run parameter " + parameterName + " = " + testRunParameter.Value, EventLogEntryType.Information);
+                            }
+                            parameters.Add(parameterName, testRunParameter.Value);
+                        }
+                    }
+                }
+
                 //See if we have an attached or linked test script
                 if (automatedTestRun.Type == AutomatedTestRun.AttachmentType.URL)
                 {
@@ -162,7 +193,9 @@ namespace SampleAutomationEngine
                         }
 
                         /*
-                         * TODO: Add the external-tool specific code to actually run the test located at the location specified by 'path'
+                         * TODO: Add the external-tool specific code to actually run the test using these values:
+                         *  -path   - The path of the test case to execute
+                         *  -parameters - A dictionary of parameters to use (if the engine supports parameters)
                          */
                     }
                     else
@@ -188,17 +221,29 @@ namespace SampleAutomationEngine
                     string testScript = Encoding.UTF8.GetString(automatedTestRun.TestScript);
 
                     /*
-                     * TODO: Add the external-tool specific code to actually run the test script stored in 'testScript'
+                     * TODO: Add the external-tool specific code to actually run the test script using these values:
+                     *  -testScript - The text of the actual test script to execute
+                     *  -parameters - A dictionary of parameters to use (if the engine supports parameters)
                      */
                 }
 
-                //Track the time that it took to run the test
+                //Capture the time that it took to run the test
                 DateTime endDate = DateTime.Now;
 
-                //TODO: Continue from here
+                //Now extract the test results
 
                 /*
-                //Now extract the test results and populate the test run object
+                 * TODO: Need to write the code to actually extract the results from the external testing tool
+                 *      and transform them into the format expected by SpiraTest and RemoteLaunch.
+                 *          - externalTestStatus
+                 *          - externalTestSummary
+                 *          - externalTestDetailedResults
+                 */
+                string externalTestStatus = "Passed"; //TODO: Replace with real values
+                string externalTestSummary = "5 passed, 4 errors, 3 warnings, 2 informational"; //TODO: Replace with real values
+                string externalTestDetailedResults = ""; //TODO: Replace with real values
+
+                //Populate the Test Run object with the results
                 if (String.IsNullOrEmpty(automatedTestRun.RunnerName))
                 {
                     automatedTestRun.RunnerName = this.ExtensionName;
@@ -206,30 +251,28 @@ namespace SampleAutomationEngine
                 automatedTestRun.RunnerTestName = Path.GetFileNameWithoutExtension(automatedTestRun.FilenameOrUrl);
 
                 //Convert the status for use in SpiraTest
-                TestRun.TestStatusEnum executionStatus;
-                if (status == SeleniumCommand.CommandExecutionStatus.OK)
+
+                /*
+                 * TODO: Change the CASE statement to match the statuses that the external tool uses
+                 */
+                TestRun.TestStatusEnum executionStatus = TestRun.TestStatusEnum.NotRun;
+                switch (externalTestStatus)
                 {
-                    executionStatus = TestRun.TestStatusEnum.Passed;
-                }
-                else
-                {
-                    executionStatus = TestRun.TestStatusEnum.Failed;
-                }
-                //Now build the results message
-                StringBuilder resultsLog = new StringBuilder();
-                int successCount = 0;
-                int failureCount = 0;
-                foreach (SeleniumCommand command in commands)
-                {
-                    resultsLog.AppendLine(command.ToString());
-                    if (command.Status == SeleniumCommand.CommandExecutionStatus.OK)
-                    {
-                        successCount++;
-                    }
-                    else
-                    {
-                        failureCount++;
-                    }
+                    case "PASSED":
+                        executionStatus = TestRun.TestStatusEnum.Passed;
+                        break;
+
+                    case "BLOCKED":
+                        executionStatus = TestRun.TestStatusEnum.Blocked;
+                        break;
+
+                    case "FAILED":
+                        executionStatus = TestRun.TestStatusEnum.Failed;
+                        break;
+                    
+                    case "CAUTION":
+                        executionStatus = TestRun.TestStatusEnum.Caution;
+                        break;
                 }
 
                 //Specify the start/end dates
@@ -238,8 +281,8 @@ namespace SampleAutomationEngine
 
                 //The result log
                 automatedTestRun.ExecutionStatus = executionStatus;
-                automatedTestRun.RunnerMessage = "Tests completed with " + successCount + " successful commands and " + failureCount + " failures.";
-                automatedTestRun.RunnerStackTrace = resultsLog.ToString();*/
+                automatedTestRun.RunnerMessage = externalTestSummary;
+                automatedTestRun.RunnerStackTrace = externalTestDetailedResults;
 
                 //Report as complete               
                 base.status = EngineStatus.OK;
