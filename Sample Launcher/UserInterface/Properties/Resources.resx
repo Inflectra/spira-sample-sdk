@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="App_AreYouSureToExit" xml:space="preserve">
+    <value>Are you sure you want to close the application?
+Without the application running, no tests will be executed.</value>
+  </data>
+  <data name="App_AreYouSureToExitHeader" xml:space="preserve">
+    <value>Exit?</value>
+  </data>
+  <data name="App_CannotRunManualTest" xml:space="preserve">
+    <value>You cannot run a manual test when an automated test is already executing.</value>
+  </data>
+  <data name="App_CannotRunTest" xml:space="preserve">
+    <value>Cannot Run Test</value>
+  </data>
+  <data name="App_ConnectToServerError" xml:space="preserve">
+    <value>The server could not be contacted to retrieve test information.
+Please go into the settings and verify the server and user information, then run the test file again.</value>
+  </data>
+  <data name="App_Error" xml:space="preserve">
+    <value>Error:</value>
+  </data>
+  <data name="App_ErrorLaunchingBrowser" xml:space="preserve">
+    <value>Error Opening Site</value>
+  </data>
+  <data name="App_ErrorLaunchingBrowserMessage" xml:space="preserve">
+    <value>Could not launch URL. You can find the documentation online at:
+{0}</value>
+  </data>
+  <data name="App_InvalidConfiguration" xml:space="preserve">
+    <value>Invalid Configuration Settings</value>
+  </data>
+  <data name="App_InvalidConfigurationMessage" xml:space="preserve">
+    <value>The application's configuration is not set properly. Please go to the Client Setup tab to correct.</value>
+  </data>
+  <data name="App_NotifyIconMenuConfig" xml:space="preserve">
+    <value>&amp;Configuration</value>
+  </data>
+  <data name="App_NotifyIconMenuConfigTooltip" xml:space="preserve">
+    <value>Opens the Configuration and Status window.</value>
+  </data>
+  <data name="App_NotifyIconMenuExit" xml:space="preserve">
+    <value>E&amp;xit</value>
+  </data>
+  <data name="App_NotifyIconMenuExitTooltip" xml:space="preserve">
+    <value>Shuts down the application.</value>
+  </data>
+  <data name="App_NotifyIconMenuHelp" xml:space="preserve">
+    <value>&amp;Help</value>
+  </data>
+  <data name="App_NotifyIconMenuHelpAbout" xml:space="preserve">
+    <value>&amp;About</value>
+  </data>
+  <data name="App_NotifyIconMenuHelpAboutTooltip" xml:space="preserve">
+    <value>Displays application and loaded plugin information.</value>
+  </data>
+  <data name="App_NotifyIconMenuHelpTooltip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="App_NotifyIconMenuHelpView" xml:space="preserve">
+    <value>&amp;View Help</value>
+  </data>
+  <data name="App_NotifyIconMenuHelpViewTooltip" xml:space="preserve">
+    <value>Opens the application's Help.</value>
+  </data>
+  <data name="App_NotifyIconMenuPause" xml:space="preserve">
+    <value>&amp;Pause</value>
+  </data>
+  <data name="App_NotifyIconMenuPauseTooltip" xml:space="preserve">
+    <value>Pauses polling of events and execution of scheduled tests.</value>
+  </data>
+  <data name="App_NotifyIconMenuPollnow" xml:space="preserve">
+    <value>&amp;Poll Now</value>
+  </data>
+  <data name="App_NotifyIconMenuPollnowTooltip" xml:space="preserve">
+    <value>Force a poll now for any scheduled tests.</value>
+  </data>
+  <data name="App_NotifyIconMenuResume" xml:space="preserve">
+    <value>&amp;Resume</value>
+  </data>
+  <data name="App_NotifyIconMenuResumeTooltip" xml:space="preserve">
+    <value>Resumes polling of events and execution of scheduled tests.</value>
+  </data>
+  <data name="App_NotifyIconStatusNextUpdate" xml:space="preserve">
+    <value>Next update in {0}</value>
+  </data>
+  <data name="App_NotifyIconStatusPaused" xml:space="preserve">
+    <value>Application is Paused</value>
+  </data>
+  <data name="App_NotifyIconStatusPolling" xml:space="preserve">
+    <value>Updating Test Schedule...</value>
+  </data>
+  <data name="App_NotifyIconWelcomeText" xml:space="preserve">
+    <value>The program is minimized, and will automatically scan for requests for tests on this system.</value>
+  </data>
+  <data name="App_RunningTest" xml:space="preserve">
+    <value>Running Test:</value>
+  </data>
+  <data name="App_ServerErrorMessage" xml:space="preserve">
+    <value>The server specified in the test file is different than the one currently configured.
+Please go into the settings and correct the server information, then run the test file again.</value>
+  </data>
+  <data name="Config_ServerSettings_ConnectedSucceeded" xml:space="preserve">
+    <value>Successfully connected to the SpiraTeam server.</value>
+  </data>
+  <data name="Config_ServerSettings_ConnectionFailed" xml:space="preserve">
+    <value>Unable to connect to the server ({0})</value>
+  </data>
+  <data name="Config_ServerSettings_InvalidUrl" xml:space="preserve">
+    <value>The URL specified is not valid</value>
+  </data>
+  <data name="Config_ServerSettings_UrlNotIncludeLogin" xml:space="preserve">
+    <value>The URL specified should not include the .aspx part of the URL</value>
+  </data>
+</root>

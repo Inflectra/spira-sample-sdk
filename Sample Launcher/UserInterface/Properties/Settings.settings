@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Inflectra.Rapise.RapiseLauncher.UserInteface.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="App_TraceLog" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Spira_Server" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost/SpiraTeam</Value>
+    </Setting>
+    <Setting Name="Spira_User" Type="System.String" Scope="User">
+      <Value Profile="(Default)">administrator</Value>
+    </Setting>
+    <Setting Name="Spira_Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CyrnfrPunatr</Value>
+    </Setting>
+    <Setting Name="Spira_PollingFreq" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">60</Value>
+    </Setting>
+    <Setting Name="Spira_PollAhead" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">240</Value>
+    </Setting>
+    <Setting Name="App_HostName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TestHost1</Value>
+    </Setting>
+    <Setting Name="App_RunOverdue" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
