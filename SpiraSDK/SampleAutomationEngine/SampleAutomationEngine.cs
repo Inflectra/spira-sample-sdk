@@ -12,17 +12,14 @@ using System.Text.RegularExpressions;
 namespace SampleAutomationEngine
 {
     /// <summary>
-    /// Sample data-synchronization provider that synchronizes incidents between SpiraTest/Plan/Team and an external system
-    /// </summary>
-
-    /// <summary>
-    /// Sample test automation engine plugin that implements the IAutomationEngine class.
+    /// Sample test automation engine plugin that implements the IAutomationEngine4 class.
+    /// This is the latest version of the interface and is used by RemoteLaunch 4.0+
     /// This class is instantiated by the RemoteLaunch application
     /// </summary>
     /// <remarks>
     /// The AutomationEngine class provides some of the generic functionality
     /// </remarks>
-    public class SampleAutomationEngine : AutomationEngine, IAutomationEngine
+    public class SampleAutomationEngine : AutomationEngine, IAutomationEngine4
     {
         private const string CLASS_NAME = "SampleAutomationEngine";
 
@@ -114,12 +111,20 @@ namespace SampleAutomationEngine
             }
         }
 
+        /* Leave this function un-implemented */
+        public override AutomatedTestRun StartExecution(AutomatedTestRun automatedTestRun)
+        {
+            //Not used since we implement the V4 API instead
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// This is the main method that is used to start automated test execution
         /// </summary>
         /// <param name="automatedTestRun">The automated test run object</param>
+        /// <param name="projectId">The id of the project</param>
         /// <returns>Either the populated test run or an exception</returns>
-        public override AutomatedTestRun StartExecution(AutomatedTestRun automatedTestRun)
+        public AutomatedTestRun4 StartExecution(AutomatedTestRun4 automatedTestRun, int projectId)
         {
             //Set status to OK
             base.status = EngineStatus.OK;
@@ -168,7 +173,7 @@ namespace SampleAutomationEngine
                 }
 
                 //See if we have an attached or linked test script
-                if (automatedTestRun.Type == AutomatedTestRun.AttachmentType.URL)
+                if (automatedTestRun.Type == AutomatedTestRun4.AttachmentType.URL)
                 {
                     //The "URL" of the test is actually the full file path of the file that contains the test script
                     //Some automation engines need additional parameters which can be provided by allowing the test script filename
@@ -255,23 +260,23 @@ namespace SampleAutomationEngine
                 /*
                  * TODO: Change the CASE statement to match the statuses that the external tool uses
                  */
-                TestRun.TestStatusEnum executionStatus = TestRun.TestStatusEnum.NotRun;
+                AutomatedTestRun4.TestStatusEnum executionStatus = AutomatedTestRun4.TestStatusEnum.NotRun;
                 switch (externalTestStatus)
                 {
                     case "PASSED":
-                        executionStatus = TestRun.TestStatusEnum.Passed;
+                        executionStatus = AutomatedTestRun4.TestStatusEnum.Passed;
                         break;
 
                     case "BLOCKED":
-                        executionStatus = TestRun.TestStatusEnum.Blocked;
+                        executionStatus = AutomatedTestRun4.TestStatusEnum.Blocked;
                         break;
 
                     case "FAILED":
-                        executionStatus = TestRun.TestStatusEnum.Failed;
+                        executionStatus = AutomatedTestRun4.TestStatusEnum.Failed;
                         break;
                     
                     case "CAUTION":
-                        executionStatus = TestRun.TestStatusEnum.Caution;
+                        executionStatus = AutomatedTestRun4.TestStatusEnum.Caution;
                         break;
                 }
 
@@ -283,6 +288,49 @@ namespace SampleAutomationEngine
                 automatedTestRun.ExecutionStatus = executionStatus;
                 automatedTestRun.RunnerMessage = externalTestSummary;
                 automatedTestRun.RunnerStackTrace = externalTestDetailedResults;
+
+                //The format of the stack trace
+                automatedTestRun.Format = AutomatedTestRun4.TestRunFormat.HTML;
+                automatedTestRun.Format = AutomatedTestRun4.TestRunFormat.PlainText;
+                /*
+                 * TODO: Comment out the format that's not being used
+                 */
+
+                //Populate any test steps on the test run
+                automatedTestRun.TestRunSteps = new List<TestRunStep4>();
+                int position = 1;
+
+                /*
+                 * TODO: Use the following code in a for...next loop to add test runs for each returned test operation
+                 */
+
+                //Create the test step
+                TestRunStep4 testRunStep = new TestRunStep4();
+                testRunStep.Description = "Description";
+                testRunStep.ExpectedResult = "ExpectedResult";
+                testRunStep.ActualResult = "ActualResult";
+                testRunStep.SampleData = "SampleData";
+
+                //TODO: Convert the status to the appropriate enumeration value
+                testRunStep.ExecutionStatusId = (int)AutomatedTestRun4.TestStatusEnum.Passed;
+
+                //Add the test step
+                testRunStep.Position = position++;                
+                automatedTestRun.TestRunSteps.Add(testRunStep);
+
+                //Populate any screenshots being added to the test run
+                automatedTestRun.Screenshots = new List<TestRunScreenshot4>();
+
+                /*
+                 * TODO: Use the following code in a for...next loop to add attachments for each captured screenshot
+                 * Replace the byte[] image = null with actual code for retrieving and populating the screenshot image
+                 */
+                TestRunScreenshot4 screenshot = new TestRunScreenshot4();
+                byte[] image = null;
+                screenshot.Data = image;
+                screenshot.Filename = "Screenshot.png";
+                screenshot.Description = "Description of screenshot";
+                automatedTestRun.Screenshots.Add(screenshot);
 
                 //Report as complete               
                 base.status = EngineStatus.OK;
