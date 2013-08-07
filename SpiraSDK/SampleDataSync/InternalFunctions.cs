@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SampleDataSync.SpiraImportExport;
 
 namespace SampleDataSync
 {
@@ -92,207 +93,108 @@ namespace SampleDataSync
         }
 
         /// <summary>
-        /// Extracts the matching custom property text value from an artifact
+        /// Sets a custom property value on an artifact, even if it doesn't have an entry yet, can handle the various types
         /// </summary>
-        /// <param name="remoteArtifact">The artifact</param>
-        /// <param name="customPropertyName">The name of the custom property</param>
-        /// <returns></returns>
-        public static String GetCustomPropertyTextValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName)
+        /// <param name="remoteArtifact">The artifact we're setting the properties on</param>
+        /// <param name="propertyNumber">The position number (1-30) of the custom property</param>
+        /// <param name="propertyValue">The typed property value</param>
+        public static void SetCustomPropertyValue<T>(RemoteArtifact remoteArtifact, int propertyNumber, T propertyValue)
         {
-            if (customPropertyName == "TEXT_01")
+            //First see if we have any custom properties at all for this artifact, if not, create a collection
+            List<RemoteArtifactCustomProperty> artifactCustomProperties;
+            if (remoteArtifact.CustomProperties == null)
             {
-                return remoteArtifact.Text01;
+                artifactCustomProperties = new List<RemoteArtifactCustomProperty>();
             }
-            if (customPropertyName == "TEXT_02")
+            else
             {
-                return remoteArtifact.Text02;
+                artifactCustomProperties = remoteArtifact.CustomProperties.ToList();
             }
-            if (customPropertyName == "TEXT_03")
+
+            //Now see if we have a matching property already in the list
+            RemoteArtifactCustomProperty artifactCustomProperty = artifactCustomProperties.FirstOrDefault(c => c.PropertyNumber == propertyNumber);
+            if (artifactCustomProperty == null)
             {
-                return remoteArtifact.Text03;
+                artifactCustomProperty = new RemoteArtifactCustomProperty();
+                artifactCustomProperty.PropertyNumber = propertyNumber;
+                artifactCustomProperties.Add(artifactCustomProperty);
             }
-            if (customPropertyName == "TEXT_04")
+
+            //Set the value that matches this type
+            if (typeof(T) == typeof(String))
             {
-                return remoteArtifact.Text04;
+                artifactCustomProperty.StringValue = ((T)propertyValue as String);
             }
-            if (customPropertyName == "TEXT_05")
+            if (typeof(T) == typeof(Int32) || typeof(T) == typeof(Nullable<Int32>))
             {
-                return remoteArtifact.Text05;
+                artifactCustomProperty.IntegerValue = ((T)propertyValue as Int32?);
             }
-            if (customPropertyName == "TEXT_06")
+
+            if (typeof(T) == typeof(Boolean) || typeof(T) == typeof(Nullable<Boolean>))
             {
-                return remoteArtifact.Text06;
+                artifactCustomProperty.BooleanValue = ((T)propertyValue as bool?);
             }
-            if (customPropertyName == "TEXT_07")
+
+            if (typeof(T) == typeof(DateTime) || typeof(T) == typeof(Nullable<DateTime>))
             {
-                return remoteArtifact.Text07;
+                artifactCustomProperty.DateTimeValue = ((T)propertyValue as DateTime?);
             }
-            if (customPropertyName == "TEXT_08")
+
+            if (typeof(T) == typeof(Decimal) || typeof(T) == typeof(Nullable<Decimal>))
             {
-                return remoteArtifact.Text08;
+                artifactCustomProperty.DecimalValue = ((T)propertyValue as Decimal?);
             }
-            if (customPropertyName == "TEXT_09")
+
+            if (typeof(T) == typeof(Int32[]))
             {
-                return remoteArtifact.Text09;
+                artifactCustomProperty.IntegerListValue = ((T)propertyValue as Int32[]);
             }
-            if (customPropertyName == "TEXT_10")
+
+            if (typeof(T) == typeof(List<Int32>))
             {
-                return remoteArtifact.Text10;
+                List<Int32> intList = (List<Int32>)((T)propertyValue as List<Int32>);
+                if (intList == null || intList.Count == 0)
+                {
+                    artifactCustomProperty.IntegerListValue = null;
+                }
+                else
+                {
+                    artifactCustomProperty.IntegerListValue = intList.ToArray();
+                }
             }
-            return null;
+
+            //Finally we need to update the artifact's array
+            remoteArtifact.CustomProperties = artifactCustomProperties.ToArray();
         }
 
         /// <summary>
-        /// Extracts the matching custom property list value from an artifact
+        /// Gets the deserialized custom property value in a format that can be handled by TFS
         /// </summary>
-        /// <param name="remoteArtifact">The artifact</param>
-        /// <param name="customPropertyName">The name of the custom property</param>
+        /// <param name="artifactCustomProperty">The artifact custom property</param>
         /// <returns></returns>
-        public static Nullable<int> GetCustomPropertyListValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName)
+        /// <remarks>Not to be used for multi-valued list properties</remarks>
+        public static object GetCustomPropertyValue(RemoteArtifactCustomProperty artifactCustomProperty)
         {
-            if (customPropertyName == "LIST_01")
+            //See if we have value on one of the non-string types
+            if (artifactCustomProperty.BooleanValue.HasValue)
             {
-                return remoteArtifact.List01;
+                return artifactCustomProperty.BooleanValue.Value;
             }
-            if (customPropertyName == "LIST_02")
+            if (artifactCustomProperty.DateTimeValue.HasValue)
             {
-                return remoteArtifact.List02;
+                return artifactCustomProperty.DateTimeValue.Value;
             }
-            if (customPropertyName == "LIST_03")
+            if (artifactCustomProperty.DecimalValue.HasValue)
             {
-                return remoteArtifact.List03;
+                return artifactCustomProperty.DecimalValue.Value;
             }
-            if (customPropertyName == "LIST_04")
+            if (artifactCustomProperty.IntegerValue.HasValue)
             {
-                return remoteArtifact.List04;
+                return artifactCustomProperty.IntegerValue.Value;
             }
-            if (customPropertyName == "LIST_05")
-            {
-                return remoteArtifact.List05;
-            }
-            if (customPropertyName == "LIST_06")
-            {
-                return remoteArtifact.List06;
-            }
-            if (customPropertyName == "LIST_07")
-            {
-                return remoteArtifact.List07;
-            }
-            if (customPropertyName == "LIST_08")
-            {
-                return remoteArtifact.List08;
-            }
-            if (customPropertyName == "LIST_09")
-            {
-                return remoteArtifact.List09;
-            }
-            if (customPropertyName == "LIST_10")
-            {
-                return remoteArtifact.List10;
-            }
-            return null;
-        }
 
-        /// <summary>
-        /// Sets the matching custom property text value on an artifact
-        /// </summary>
-        /// <param name="remoteArtifact">The artifact</param>
-        /// <param name="customPropertyName">The name of the custom property</param>
-        /// <param name="value">The value to set</param>
-        /// <returns></returns>
-        public static void SetCustomPropertyTextValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName, string value)
-        {
-            if (customPropertyName == "TEXT_01")
-            {
-                remoteArtifact.Text01 = value;
-            }
-            if (customPropertyName == "TEXT_02")
-            {
-                remoteArtifact.Text02 = value;
-            }
-            if (customPropertyName == "TEXT_03")
-            {
-                remoteArtifact.Text03 = value;
-            }
-            if (customPropertyName == "TEXT_04")
-            {
-                remoteArtifact.Text04 = value;
-            }
-            if (customPropertyName == "TEXT_05")
-            {
-                remoteArtifact.Text05 = value;
-            }
-            if (customPropertyName == "TEXT_06")
-            {
-                remoteArtifact.Text06 = value;
-            }
-            if (customPropertyName == "TEXT_07")
-            {
-                remoteArtifact.Text07 = value;
-            }
-            if (customPropertyName == "TEXT_08")
-            {
-                remoteArtifact.Text08 = value;
-            }
-            if (customPropertyName == "TEXT_09")
-            {
-                remoteArtifact.Text09 = value;
-            }
-            if (customPropertyName == "TEXT_10")
-            {
-                remoteArtifact.Text10 = value;
-            }
-        }
-
-        /// <summary>
-        /// Sets the matching custom property list value on an artifact
-        /// </summary>
-        /// <param name="remoteArtifact">The artifact</param>
-        /// <param name="customPropertyName">The name of the custom property</param>
-        /// <param name="value">The value to set</param>
-        /// <returns></returns>
-        public static void SetCustomPropertyListValue(SpiraImportExport.RemoteArtifact remoteArtifact, string customPropertyName, Nullable<int> value)
-        {
-            if (customPropertyName == "LIST_01")
-            {
-                remoteArtifact.List01 = value;
-            }
-            if (customPropertyName == "LIST_02")
-            {
-                remoteArtifact.List02 = value;
-            }
-            if (customPropertyName == "LIST_03")
-            {
-                remoteArtifact.List03 = value;
-            }
-            if (customPropertyName == "LIST_04")
-            {
-                remoteArtifact.List04 = value;
-            }
-            if (customPropertyName == "LIST_05")
-            {
-                remoteArtifact.List05 = value;
-            }
-            if (customPropertyName == "LIST_06")
-            {
-                remoteArtifact.List06 = value;
-            }
-            if (customPropertyName == "LIST_07")
-            {
-                remoteArtifact.List07 = value;
-            }
-            if (customPropertyName == "LIST_08")
-            {
-                remoteArtifact.List08 = value;
-            }
-            if (customPropertyName == "LIST_09")
-            {
-                remoteArtifact.List09 = value;
-            }
-            if (customPropertyName == "LIST_10")
-            {
-                remoteArtifact.List10 = value;
-            }
+            //Otherwise just return the string value
+            return artifactCustomProperty.StringValue;
         }
 
         /// <summary>
@@ -365,6 +267,9 @@ namespace SampleDataSync
                 // insert line breaks in places of <BR> and <LI> tags
                 result = System.Text.RegularExpressions.Regex.Replace(result,
                     @"<( )*br( )*>", "\r",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                result = System.Text.RegularExpressions.Regex.Replace(result,
+                    @"<( )*br( )*/>", "\r",
                     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 result = System.Text.RegularExpressions.Regex.Replace(result,
                     @"<( )*li( )*>", "\r",

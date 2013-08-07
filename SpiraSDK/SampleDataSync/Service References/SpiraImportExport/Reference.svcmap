@@ -18,11 +18,11 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://localhost/Spira/Services/v3_0/ImportExport.svc" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://localhost/Spira40/Services/v4_0/ImportExport.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="ImportExport.wsdl" MetadataType="Wsdl" ID="b205aa20-0f17-48b0-bd6e-f80705481154" SourceId="1" SourceUrl="http://localhost/Spira/Services/v3_0/ImportExport.svc?wsdl" />
-    <MetadataFile FileName="ImportExport.disco" MetadataType="Disco" ID="f4dcecd5-f553-4a98-b198-b32977513478" SourceId="1" SourceUrl="http://localhost/Spira/Services/v3_0/ImportExport.svc?disco" />
+    <MetadataFile FileName="ImportExport1.wsdl" MetadataType="Wsdl" ID="497dc6fe-1319-4dec-90b0-c206d33605d8" SourceId="1" SourceUrl="http://localhost/Spira40/Services/v4_0/ImportExport.svc?wsdl" />
+    <MetadataFile FileName="ImportExport1.disco" MetadataType="Disco" ID="b9dd2bb2-1441-42fa-8bb6-411516983015" SourceId="1" SourceUrl="http://localhost/Spira40/Services/v4_0/ImportExport.svc?disco" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SampleVersionControlProvider")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Sample Version Control Provider")]
+[assembly: AssemblyDescription("Template project for creating a SCM plugin for SpiraPlan/SpiraTeam version-control")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("Inflectra Corporation")]
 [assembly: AssemblyProduct("SampleVersionControlProvider")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © Inflectra Corporation 2006-2013")]
+[assembly: AssemblyTrademark("SpiraPlan and SpiraTeam are either trademarks or registered trademarks of Inflectra Corporation")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

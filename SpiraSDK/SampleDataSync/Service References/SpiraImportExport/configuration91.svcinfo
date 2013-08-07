@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="tRibmfcYZrTT/i2pmyZI9je5KSY=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="hs3tQTXkxYDE9Zg/ucvHnDkl5q8=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_IImportExport">
       <properties>
@@ -221,10 +221,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_IImportExport" contract="SpiraImportExport.IImportExport" bindingType="basicHttpBinding" address="http://localhost/Spira/Services/v3_0/ImportExport.svc" bindingConfiguration="BasicHttpBinding_IImportExport">
+    <endpoint name="BasicHttpBinding_IImportExport" contract="SpiraImportExport.IImportExport" bindingType="basicHttpBinding" address="http://localhost/Spira40/Services/v4_0/ImportExport.svc" bindingConfiguration="BasicHttpBinding_IImportExport">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://localhost/Spira/Services/v3_0/ImportExport.svc</serializedValue>
+          <serializedValue>http://localhost/Spira40/Services/v4_0/ImportExport.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
@@ -306,10 +306,10 @@
         </property>
       </properties>
     </endpoint>
-    <endpoint name="BasicHttpBinding_IImportExport1" contract="SpiraImportExport.IImportExport" bindingType="basicHttpBinding" address="https://tardis.corp.inflectra.com/Spira/Services/v3_0/ImportExport.svc" bindingConfiguration="BasicHttpBinding_IImportExport1">
+    <endpoint name="BasicHttpBinding_IImportExport1" contract="SpiraImportExport.IImportExport" bindingType="basicHttpBinding" address="https://tardis.corp.inflectra.com/Spira40/Services/v4_0/ImportExport.svc" bindingConfiguration="BasicHttpBinding_IImportExport1">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>https://tardis.corp.inflectra.com/Spira/Services/v3_0/ImportExport.svc</serializedValue>
+          <serializedValue>https://tardis.corp.inflectra.com/Spira40/Services/v4_0/ImportExport.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
