@@ -74,6 +74,15 @@ namespace SampleDataSync
             Precision = 8
         }
 
+        /// <summary>
+        /// The different types of attachment
+        /// </summary>
+        public enum AttachmentType
+        {
+            File = 1,
+            URL = 2
+        }
+
         #endregion
     }
 }

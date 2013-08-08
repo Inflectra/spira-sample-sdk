@@ -7,6 +7,7 @@ using Inflectra.SpiraTest.PlugIns;
 using System.Diagnostics;
 using SampleDataSync.SpiraImportExport;
 using System.Globalization;
+using System.ServiceModel;
 
 namespace SampleDataSync
 {
@@ -378,12 +379,38 @@ namespace SampleDataSync
             //Make sure we've not already loaded this issue
             if (InternalFunctions.FindMappingByInternalId(projectId, incidentId, incidentMappings) == null)
             {
-                //We need to add the incident number and owner in the description to make it easier
-                //to track issues between the two systems. Also include a link
+                //Get the URL for the incident in Spira, we'll use it later
                 string baseUrl = spiraImportExport.System_GetWebServerUrl();
                 string incidentUrl = spiraImportExport.System_GetArtifactUrl((int)Constants.ArtifactType.Incident, projectId, incidentId, "").Replace("~", baseUrl);
+
+                //Get the name/description of the incident. The description will be available in both rich (HTML) and plain-text
+                //depending on what the external system can handle
                 string externalName = remoteIncident.Name;
-                string externalDescription = "Incident [" + Constants.INCIDENT_PREFIX + remoteIncident.IncidentId.ToString() + "|" + incidentUrl + "] detected by " + remoteIncident.OpenerName + " in " + productName + ".\n" + InternalFunctions.HtmlRenderAsPlainText(remoteIncident.Description);
+                string externalDescriptionHtml = remoteIncident.Description;
+                string externalDescriptionPlainText = InternalFunctions.HtmlRenderAsPlainText(externalDescriptionHtml);
+
+                //See if this incident has any associations
+                RemoteSort associationSort = new RemoteSort();
+                associationSort.SortAscending = true;
+                associationSort.PropertyName = "CreationDate";
+                RemoteAssociation[] remoteAssociations = spiraImportExport.Association_RetrieveForArtifact((int)Constants.ArtifactType.Incident, incidentId, null, associationSort);
+
+                //See if this incident has any attachments
+                RemoteSort attachmentSort = new RemoteSort();
+                attachmentSort.SortAscending = true;
+                attachmentSort.PropertyName = "AttachmentId";
+                RemoteDocument[] remoteDocuments = spiraImportExport.Document_RetrieveForArtifact((int)Constants.ArtifactType.Incident, incidentId, null, attachmentSort);
+
+                //Get some of the incident's non-mappable fields
+                DateTime creationDate = remoteIncident.CreationDate.Value;
+                DateTime lastUpdateDate = remoteIncident.LastUpdateDate;
+                DateTime? startDate = remoteIncident.StartDate;
+                DateTime? closedDate = remoteIncident.ClosedDate;
+                int? estimatedEffortInMinutes = remoteIncident.EstimatedEffort;
+                int? actualEffortInMinutes = remoteIncident.ActualEffort;
+                int? projectedEffortInMinutes = remoteIncident.ProjectedEffort;
+                int? remainingEffortInMinutes = remoteIncident.RemainingEffort;
+                int completionPercent = remoteIncident.CompletionPercent;
 
                 //Now get the external system's equivalent incident status from the mapping
                 RemoteDataMapping dataMapping = InternalFunctions.FindMappingByInternalId(projectId, remoteIncident.IncidentStatusId.Value, statusMappings);
@@ -606,7 +633,8 @@ namespace SampleDataSync
                 /*
                  * TODO: Create the incident in the external system using the following values
                  *  - externalName
-                 *  - externalDescription
+                 *  - externalDescriptionHtml
+                 *  - externalDescriptionPlainText
                  *  - externalProjectId
                  *  - externalStatus
                  *  - externalType
@@ -616,6 +644,16 @@ namespace SampleDataSync
                  *  - externalAssignee
                  *  - externalDetectedRelease
                  *  - externalResolvedRelease
+                 *  - externalSystemCustomFieldValues
+                 *  - startDate
+                 *  - closedDate
+                 *  - creationDate
+                 *  - lastUpdateDate
+                 *  - estimatedEffortInMinutes
+                 *  - actualEffortInMinutes
+                 *  - projectedEffortInMinutes
+                 *  - remainingEffortInMinutes
+                 *  - completionPercent
                  *  
                  * We assume that the ID of the new bug generated is stored in externalBugId
                  */
@@ -651,7 +689,7 @@ namespace SampleDataSync
                     foreach (RemoteComment incidentComment in incidentComments)
                     {
                         string externalResolutionText = incidentComment.Text;
-                        DateTime creationDate = incidentComment.CreationDate.Value;
+                        creationDate = incidentComment.CreationDate.Value;
 
                         //Get the id of the corresponding external user that added the comments
                         string externalCommentAuthor = "";
@@ -672,6 +710,66 @@ namespace SampleDataSync
                          *  - creationDate
                          *  - externalCommentAuthor
                          */
+                    }
+                }
+
+                //See if we have any attachments to add to the external bug
+                if (remoteDocuments != null && remoteDocuments.Length > 0)
+                {
+                    foreach (RemoteDocument remoteDocument in remoteDocuments)
+                    {
+                        //See if we have a file attachment or simple URL
+                        if (remoteDocument.AttachmentTypeId == (int)Constants.AttachmentType.File)
+                        {
+                            try
+                            {
+                                //Get the binary data for the attachment
+                                byte[] binaryData = spiraImportExport.Document_OpenFile(remoteDocument.AttachmentId.Value);
+                                if (binaryData != null && binaryData.Length > 0)
+                                {
+                                    //TODO: Add the code to add this attachment to the external system
+                                    string filename = remoteDocument.FilenameOrUrl;
+                                    string description = remoteDocument.Description;
+                                }
+                            }
+                            catch (Exception exception)
+                            {
+                                //Log an error and continue because this can fail if the files are too large
+                                LogErrorEvent("Error adding " + productName + " incident attachment DC" + remoteDocument.AttachmentId.Value + " to JIRA: " + exception.Message + "\n. (The issue itself was added.)\n Stack Trace: " + exception.StackTrace, EventLogEntryType.Error);
+                            }
+                        }
+                        if (remoteDocument.AttachmentTypeId == (int)Constants.AttachmentType.URL)
+                        {
+                            try
+                            {
+                                //TODO: Add the code to add this hyperlink to the external system
+                                string url = remoteDocument.FilenameOrUrl;
+                                string description = remoteDocument.Description;
+                            }
+                            catch (Exception exception)
+                            {
+                                //Log an error and continue because this can fail if the files are too large
+                                LogErrorEvent("Error adding " + productName + " incident attachment DC" + remoteDocument.AttachmentId.Value + " to TFS: " + exception.Message + "\n. (The issue itself was added.)\n Stack Trace: " + exception.StackTrace, EventLogEntryType.Error);
+                            }
+                        }
+                    }
+                }
+
+                //See if we have any incident-to-incident associations to add to the external bug
+                if (remoteAssociations != null && remoteAssociations.Length > 0)
+                {
+                    foreach (RemoteAssociation remoteAssociation in remoteAssociations)
+                    {
+                        //Make sure the linked-to item is an incident
+                        if (remoteAssociation.DestArtifactTypeId == (int)Constants.ArtifactType.Incident)
+                        {
+                            dataMapping = InternalFunctions.FindMappingByInternalId(remoteAssociation.DestArtifactId, incidentMappings);
+                            if (dataMapping != null)
+                            {
+                                //TODO: Add a link in the external system to the following target bug id
+                                string externalTargetBugId = dataMapping.ExternalKey;
+                            }
+                        }
                     }
                 }
             }
@@ -717,6 +815,9 @@ namespace SampleDataSync
             string externalBugResolvedRelease = "";
             DateTime? externalBugStartDate = null;
             DateTime? externalBugClosedDate = null;
+            int? externalEstimatedEffortInMinutes = null;
+            int? externalActualEffortInMinutes = null;
+            int? externalRemainingEffortInMinutes = null;
 
             //Make sure the projects match (i.e. the external bug is in the project being synced)
             //It should be handled previously in the filter sent to external system, but use this as an extra check
@@ -908,6 +1009,20 @@ namespace SampleDataSync
                         if (externalBugClosedDate.HasValue)
                         {
                             remoteIncident.ClosedDate = externalBugClosedDate.Value;
+                        }
+
+                        //Update the effort values if provided
+                        if (externalEstimatedEffortInMinutes.HasValue)
+                        {
+                            remoteIncident.EstimatedEffort = externalEstimatedEffortInMinutes.Value;
+                        }
+                        if (externalActualEffortInMinutes.HasValue)
+                        {
+                            remoteIncident.ActualEffort = externalActualEffortInMinutes.Value;
+                        }
+                        if (externalRemainingEffortInMinutes.HasValue)
+                        {
+                            remoteIncident.RemainingEffort = externalRemainingEffortInMinutes.Value;
                         }
 
                         //Now we need to get all the comments attached to the bug in the external system
@@ -1145,6 +1260,71 @@ namespace SampleDataSync
                                 newIncidentComment.ArtifactId = remoteIncident.IncidentId.Value;
                             }
                             spiraImportExport.Incident_AddComments(newIncidentComments.ToArray());
+
+                            /*
+                            * TODO: Need to add the base URL onto the URL that we use to link the Spira incident to the external system
+                            */
+                            if (!String.IsNullOrEmpty(EXTERNAL_BUG_URL))
+                            {
+                                try
+                                {
+                                    string externalUrl = String.Format(EXTERNAL_BUG_URL, externalBugId);
+                                    RemoteDocument remoteUrl = new RemoteDocument();
+                                    remoteUrl.ArtifactId = remoteIncident.IncidentId.Value;
+                                    remoteUrl.ArtifactTypeId = (int)Constants.ArtifactType.Incident;
+                                    remoteUrl.Description = "Link to issue in " + EXTERNAL_SYSTEM_NAME;
+                                    remoteUrl.FilenameOrUrl = externalUrl;
+                                    spiraImportExport.Document_AddUrl(remoteUrl);
+                                }
+                                catch (Exception exception)
+                                {
+                                    //Log a message that describes why it's not working
+                                    LogErrorEvent("Unable to add " + EXTERNAL_SYSTEM_NAME + " hyperlink to the " + productName + " incident, error was: " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Warning);
+                                    //Just continue with the rest since it's optional.
+                                }
+                            }
+
+                            /*
+                             * TODO: Add code based on the following that adds file attachments to the new SpiraTest incident
+                             */
+                            //byte[] binaryData = << Attachment data in byte array format >>
+                            //RemoteDocument remoteDocument = new RemoteDocument();
+                            //remoteDocument.FilenameOrUrl = "myfilename.ext";
+                            //remoteDocument.ArtifactId = remoteIncident.IncidentId.Value;
+                            //remoteDocument.ArtifactTypeId = (int)Constants.ArtifactType.Incident;
+                            //remoteDocument.Description = "Any comments";
+                            //remoteDocument.UploadDate = DateTime.UtcNow;
+                            //spiraImportExport.Document_AddFile(remoteDocument, binaryData);
+
+                            /*
+                             * TODO: Add code based on the following that adds URL hyperlinks to the new SpiraTest incident
+                             */
+                            //RemoteDocument remoteDocument = new RemoteDocument();
+                            //remoteDocument.FilenameOrUrl = "http://www.someurl.com";
+                            //remoteDocument.ArtifactId = remoteIncident.IncidentId.Value;
+                            //remoteDocument.ArtifactTypeId = (int)Constants.ArtifactType.Incident;
+                            //remoteDocument.Description = "Any comments";
+                            //remoteDocument.UploadDate = DateTime.UtcNow;
+                            //spiraImportExport.Document_AddUrl(remoteDocument, binaryData);
+
+                            /*
+                             * TODO: Add code based on the following that adds incident-to-incident associations to the new SpiraTest incident
+                             */
+                            ////We need to get the destination incident id from the external target bug id from data mapping
+                            //string externalTargetBugId = "";    // Replace with real code to get the ID of the target bug in the external system
+                            //dataMapping = InternalFunctions.FindMappingByExternalKey(externalTargetBugId, incidentMappings);
+                            //if (dataMapping != null)
+                            //{
+                            //    //Create the new incident association
+                            //    RemoteAssociation remoteAssociation = new RemoteAssociation();
+                            //    remoteAssociation.DestArtifactId = dataMapping.InternalId;
+                            //    remoteAssociation.DestArtifactTypeId = (int)Constants.ArtifactType.Incident;
+                            //    remoteAssociation.CreationDate = DateTime.UtcNow;
+                            //    remoteAssociation.Comment = "Any comments";
+                            //    remoteAssociation.SourceArtifactId = remoteIncident.IncidentId.Value;
+                            //    remoteAssociation.SourceArtifactTypeId = (int)Constants.ArtifactType.Incident;
+                            //    spiraImportExport.Association_Create(remoteAssociation);
+                            //}
                         }
                         else
                         {
@@ -1158,10 +1338,23 @@ namespace SampleDataSync
                         }
                     }
                 }
+                catch (FaultException<ValidationFaultMessage> validationException)
+                {
+                    string message = "";
+                    ValidationFaultMessage validationFaultMessage = validationException.Detail;
+                    message = validationFaultMessage.Summary + ": \n";
+                    {
+                        foreach (ValidationFaultMessageItem messageItem in validationFaultMessage.Messages)
+                        {
+                            message += messageItem.FieldName + "=" + messageItem.Message + " \n";
+                        }
+                    }
+                    LogErrorEvent("Error Inserting/Updating " + EXTERNAL_SYSTEM_NAME + " Bug " + externalBugId + " in " + productName + " (" + message + ")\n" + validationException.StackTrace, EventLogEntryType.Error);
+                }
                 catch (Exception exception)
                 {
                     //Log and continue execution
-                    LogErrorEvent("Error Inserting/Updating " + EXTERNAL_SYSTEM_NAME + " Bug in " + productName + ": " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
+                    LogErrorEvent("Error Inserting/Updating " + EXTERNAL_SYSTEM_NAME + " Bug " + externalBugId + " in " + productName + ": " + exception.Message + "\n" + exception.StackTrace, EventLogEntryType.Error);
                 }
             }
         }
@@ -1180,12 +1373,12 @@ namespace SampleDataSync
         private void ProcessExternalSystemCustomFields(string productName, int projectId, RemoteArtifact remoteArtifact, Dictionary<string, object> externalSystemCustomFieldValues, RemoteCustomProperty[] customProperties, Dictionary<int, RemoteDataMapping> customPropertyMappingList, Dictionary<int, RemoteDataMapping[]> customPropertyValueMappingList, RemoteDataMapping[] userMappings, ImportExportClient spiraImportExport)
         {
             //Loop through all the defined Spira custom properties
-            foreach (SpiraImportExport.RemoteCustomProperty customProperty in customProperties)
+            foreach (RemoteCustomProperty customProperty in customProperties)
             {
                 //Get the external key of this custom property (if it has one)
                 if (customPropertyMappingList.ContainsKey(customProperty.CustomPropertyId.Value))
                 {
-                    SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
+                    RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
                     if (customPropertyDataMapping != null)
                     {
                         LogTraceEvent(eventLog, "Found custom property mapping for " + EXTERNAL_SYSTEM_NAME + " field " + customPropertyDataMapping.ExternalKey + "\n", EventLogEntryType.Information);
@@ -1206,8 +1399,8 @@ namespace SampleDataSync
                                 {
                                     //Need to get the Spira custom property value
                                     string fieldValue = externalSystemCustomFieldValues[externalKey].ToString();
-                                    SpiraImportExport.RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
-                                    SpiraImportExport.RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByExternalKey(projectId, fieldValue, customPropertyValueMappings, false);
+                                    RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
+                                    RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByExternalKey(projectId, fieldValue, customPropertyValueMappings, false);
                                     if (customPropertyValueMapping != null)
                                     {
                                         InternalFunctions.SetCustomPropertyValue(remoteArtifact, customProperty.PropertyNumber, customPropertyValueMapping.InternalId);
@@ -1262,7 +1455,7 @@ namespace SampleDataSync
                                 {
                                     //Need to get the Spira custom property value
                                     List<string> externalCustomFieldValues = (List<string>)externalSystemCustomFieldValues[externalKey];
-                                    SpiraImportExport.RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
+                                    RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
 
                                     //Data-map each of the custom property values
                                     //We assume that the external system has a multiselect stored list of string values (List<string>)
@@ -1408,7 +1601,7 @@ namespace SampleDataSync
                         if (artifactCustomProperty.IntegerValue.HasValue && customPropertyMappingList != null && customPropertyMappingList.ContainsKey(customProperty.CustomPropertyId.Value))
                         {
                             LogTraceEvent(eventLog, "Got value for list custom property: " + customProperty.Name + " (" + artifactCustomProperty.IntegerValue.Value + ")\n", EventLogEntryType.Information);
-                            SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
+                            RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
                             if (customPropertyDataMapping != null)
                             {
                                 string externalCustomField = customPropertyDataMapping.ExternalKey;
@@ -1416,10 +1609,10 @@ namespace SampleDataSync
                                 //Get the corresponding external custom field value (if there is one)
                                 if (!String.IsNullOrEmpty(externalCustomField) && customPropertyValueMappingList.ContainsKey(customProperty.CustomPropertyId.Value))
                                 {
-                                    SpiraImportExport.RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
+                                    RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
                                     if (customPropertyValueMappings != null)
                                     {
-                                        SpiraImportExport.RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByInternalId(projectId, artifactCustomProperty.IntegerValue.Value, customPropertyValueMappings);
+                                        RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByInternalId(projectId, artifactCustomProperty.IntegerValue.Value, customPropertyValueMappings);
                                         if (customPropertyValueMapping != null)
                                         {
                                             string externalCustomFieldValue = customPropertyValueMapping.ExternalKey;
@@ -1446,7 +1639,7 @@ namespace SampleDataSync
                         if (artifactCustomProperty.IntegerListValue != null && artifactCustomProperty.IntegerListValue.Length > 0 && customPropertyMappingList != null && customPropertyMappingList.ContainsKey(customProperty.CustomPropertyId.Value))
                         {
                             LogTraceEvent(eventLog, "Got values for multi-list custom property: " + customProperty.Name + " (Count=" + artifactCustomProperty.IntegerListValue.Length + ")\n", EventLogEntryType.Information);
-                            SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
+                            RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
                             if (customPropertyDataMapping != null && !String.IsNullOrEmpty(customPropertyDataMapping.ExternalKey))
                             {
                                 string externalCustomField = customPropertyDataMapping.ExternalKey;
@@ -1459,10 +1652,10 @@ namespace SampleDataSync
                                     //Get the corresponding external custom field value (if there is one)
                                     if (customPropertyValueMappingList.ContainsKey(customProperty.CustomPropertyId.Value))
                                     {
-                                        SpiraImportExport.RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
+                                        RemoteDataMapping[] customPropertyValueMappings = customPropertyValueMappingList[customProperty.CustomPropertyId.Value];
                                         if (customPropertyValueMappings != null)
                                         {
-                                            SpiraImportExport.RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByInternalId(projectId, customPropertyListValue, customPropertyValueMappings);
+                                            RemoteDataMapping customPropertyValueMapping = InternalFunctions.FindMappingByInternalId(projectId, customPropertyListValue, customPropertyValueMappings);
                                             if (customPropertyValueMapping != null)
                                             {
                                                 LogTraceEvent(eventLog, "Added multi-list custom property field value: " + customProperty.Name + " (Value=" + customPropertyValueMapping.ExternalKey + ")\n", EventLogEntryType.Information);
@@ -1493,7 +1686,7 @@ namespace SampleDataSync
                         //See if we have a custom property value set
                         if (artifactCustomProperty.IntegerValue.HasValue)
                         {
-                            SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
+                            RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
                             if (customPropertyDataMapping != null && !String.IsNullOrEmpty(customPropertyDataMapping.ExternalKey))
                             {
                                 string externalCustomField = customPropertyDataMapping.ExternalKey;
@@ -1530,7 +1723,7 @@ namespace SampleDataSync
                             //Get the corresponding external custom field (if there is one)
                             if (customPropertyMappingList != null && customPropertyMappingList.ContainsKey(customProperty.CustomPropertyId.Value))
                             {
-                                SpiraImportExport.RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
+                                RemoteDataMapping customPropertyDataMapping = customPropertyMappingList[customProperty.CustomPropertyId.Value];
                                 if (customPropertyDataMapping != null)
                                 {
                                     string externalCustomField = customPropertyDataMapping.ExternalKey;
