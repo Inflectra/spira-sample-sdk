@@ -735,7 +735,7 @@ namespace SampleDataSync
                             catch (Exception exception)
                             {
                                 //Log an error and continue because this can fail if the files are too large
-                                LogErrorEvent("Error adding " + productName + " incident attachment DC" + remoteDocument.AttachmentId.Value + " to JIRA: " + exception.Message + "\n. (The issue itself was added.)\n Stack Trace: " + exception.StackTrace, EventLogEntryType.Error);
+                                LogErrorEvent("Error adding " + productName + " incident attachment DC" + remoteDocument.AttachmentId.Value + " to " + EXTERNAL_SYSTEM_NAME + ": " + exception.Message + "\n. (The issue itself was added.)\n Stack Trace: " + exception.StackTrace, EventLogEntryType.Error);
                             }
                         }
                         if (remoteDocument.AttachmentTypeId == (int)Constants.AttachmentType.URL)
@@ -749,7 +749,7 @@ namespace SampleDataSync
                             catch (Exception exception)
                             {
                                 //Log an error and continue because this can fail if the files are too large
-                                LogErrorEvent("Error adding " + productName + " incident attachment DC" + remoteDocument.AttachmentId.Value + " to TFS: " + exception.Message + "\n. (The issue itself was added.)\n Stack Trace: " + exception.StackTrace, EventLogEntryType.Error);
+                                LogErrorEvent("Error adding " + productName + " incident attachment DC" + remoteDocument.AttachmentId.Value + " to " + EXTERNAL_SYSTEM_NAME + ": " + exception.Message + "\n. (The issue itself was added.)\n Stack Trace: " + exception.StackTrace, EventLogEntryType.Error);
                             }
                         }
                     }
