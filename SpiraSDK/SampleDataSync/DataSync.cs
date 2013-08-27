@@ -841,7 +841,7 @@ namespace SampleDataSync
                     }
                     else
                     {
-                        remoteIncident.Description = externalBugName;
+                        remoteIncident.Name = externalBugName;
                     }
 
                     //Set the description for new incidents
@@ -1086,7 +1086,7 @@ namespace SampleDataSync
                                     RemoteComment newIncidentComment = new RemoteComment();
                                     newIncidentComment.ArtifactId = incidentId;
                                     newIncidentComment.UserId = creatorId;
-                                    newIncidentComment.CreationDate = (externalCommentCreationDate.HasValue) ? externalCommentCreationDate.Value : DateTime.Now;
+                                    newIncidentComment.CreationDate = (externalCommentCreationDate.HasValue) ? externalCommentCreationDate.Value : DateTime.UtcNow;
                                     newIncidentComment.Text = externalCommentText;
                                     newIncidentComments.Add(newIncidentComment);
                                 }
@@ -1133,11 +1133,11 @@ namespace SampleDataSync
                                 }
                                 remoteRelease.Active = true;
                                 //If no start-date specified, simply use now
-                                remoteRelease.StartDate = (externalReleaseStartDate.HasValue) ? externalReleaseStartDate.Value : DateTime.Now;
+                                remoteRelease.StartDate = (externalReleaseStartDate.HasValue) ? externalReleaseStartDate.Value : DateTime.UtcNow;
                                 //If no end-date specified, simply use 1-month from now
-                                remoteRelease.EndDate = (externalReleaseEndDate.HasValue) ? externalReleaseEndDate.Value : DateTime.Now.AddMonths(1);
+                                remoteRelease.EndDate = (externalReleaseEndDate.HasValue) ? externalReleaseEndDate.Value : DateTime.UtcNow.AddMonths(1);
                                 remoteRelease.CreatorId = remoteIncident.OpenerId;
-                                remoteRelease.CreationDate = DateTime.Now;
+                                remoteRelease.CreationDate = DateTime.UtcNow;
                                 remoteRelease.ResourceCount = 1;
                                 remoteRelease.DaysNonWorking = 0;
                                 remoteRelease = spiraImportExport.Release_Create(remoteRelease, null);
@@ -1194,11 +1194,11 @@ namespace SampleDataSync
                                 }
                                 remoteRelease.Active = true;
                                 //If no start-date specified, simply use now
-                                remoteRelease.StartDate = (externalReleaseStartDate.HasValue) ? externalReleaseStartDate.Value : DateTime.Now;
+                                remoteRelease.StartDate = (externalReleaseStartDate.HasValue) ? externalReleaseStartDate.Value : DateTime.UtcNow;
                                 //If no end-date specified, simply use 1-month from now
-                                remoteRelease.EndDate = (externalReleaseEndDate.HasValue) ? externalReleaseEndDate.Value : DateTime.Now.AddMonths(1);
+                                remoteRelease.EndDate = (externalReleaseEndDate.HasValue) ? externalReleaseEndDate.Value : DateTime.UtcNow.AddMonths(1);
                                 remoteRelease.CreatorId = remoteIncident.OpenerId;
-                                remoteRelease.CreationDate = DateTime.Now;
+                                remoteRelease.CreationDate = DateTime.UtcNow;
                                 remoteRelease.ResourceCount = 1;
                                 remoteRelease.DaysNonWorking = 0;
                                 remoteRelease = spiraImportExport.Release_Create(remoteRelease, null);
