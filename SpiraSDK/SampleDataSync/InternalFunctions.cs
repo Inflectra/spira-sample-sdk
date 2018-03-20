@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SampleDataSync.SpiraImportExport;
+using SampleDataSync.SpiraSoapService;
 
 namespace SampleDataSync
 {
@@ -18,9 +18,9 @@ namespace SampleDataSync
         /// <param name="internalId">The internal id</param>
         /// <param name="dataMappings">The list of mappings</param>
         /// <returns>The matching entry or Null if none found</returns>
-        public static SpiraImportExport.RemoteDataMapping FindMappingByInternalId(int projectId, int internalId, SpiraImportExport.RemoteDataMapping[] dataMappings)
+        public static SpiraSoapService.RemoteDataMapping FindMappingByInternalId(int projectId, int internalId, SpiraSoapService.RemoteDataMapping[] dataMappings)
         {
-            foreach (SpiraImportExport.RemoteDataMapping dataMapping in dataMappings)
+            foreach (SpiraSoapService.RemoteDataMapping dataMapping in dataMappings)
             {
                 if (dataMapping.InternalId == internalId && dataMapping.ProjectId == projectId)
                 {
@@ -38,9 +38,9 @@ namespace SampleDataSync
         /// <param name="dataMappings">The list of mappings</param>
         /// <param name="onlyPrimaryEntries">Do we only want to locate primary entries</param>
         /// <returns>The matching entry or Null if none found</returns>
-        public static SpiraImportExport.RemoteDataMapping FindMappingByExternalKey(int projectId, string externalKey, SpiraImportExport.RemoteDataMapping[] dataMappings, bool onlyPrimaryEntries)
+        public static SpiraSoapService.RemoteDataMapping FindMappingByExternalKey(int projectId, string externalKey, SpiraSoapService.RemoteDataMapping[] dataMappings, bool onlyPrimaryEntries)
         {
-            foreach (SpiraImportExport.RemoteDataMapping dataMapping in dataMappings)
+            foreach (SpiraSoapService.RemoteDataMapping dataMapping in dataMappings)
             {
                 if (dataMapping.ExternalKey == externalKey && dataMapping.ProjectId == projectId)
                 {
@@ -61,9 +61,9 @@ namespace SampleDataSync
         /// <param name="dataMappings">The list of mappings</param>
         /// <returns>The matching entry or Null if none found</returns>
         /// <remarks>Used when no project id stored in the mapping collection</remarks>
-        public static SpiraImportExport.RemoteDataMapping FindMappingByInternalId(int internalId, SpiraImportExport.RemoteDataMapping[] dataMappings)
+        public static SpiraSoapService.RemoteDataMapping FindMappingByInternalId(int internalId, SpiraSoapService.RemoteDataMapping[] dataMappings)
         {
-            foreach (SpiraImportExport.RemoteDataMapping dataMapping in dataMappings)
+            foreach (SpiraSoapService.RemoteDataMapping dataMapping in dataMappings)
             {
                 if (dataMapping.InternalId == internalId)
                 {
@@ -80,9 +80,9 @@ namespace SampleDataSync
         /// <param name="dataMappings">The list of mappings</param>
         /// <returns>The matching entry or Null if none found</returns>
         /// <remarks>Used when no project id stored in the mapping collection</remarks>
-        public static SpiraImportExport.RemoteDataMapping FindMappingByExternalKey(string externalKey, SpiraImportExport.RemoteDataMapping[] dataMappings)
+        public static SpiraSoapService.RemoteDataMapping FindMappingByExternalKey(string externalKey, SpiraSoapService.RemoteDataMapping[] dataMappings)
         {
-            foreach (SpiraImportExport.RemoteDataMapping dataMapping in dataMappings)
+            foreach (SpiraSoapService.RemoteDataMapping dataMapping in dataMappings)
             {
                 if (dataMapping.ExternalKey == externalKey)
                 {

@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleDataSync", "SampleDataSync\SampleDataSync.csproj", "{F074502E-7FA5-4782-8C17-D59FFE901645}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAutomationEngine", "SampleAutomationEngine\SampleAutomationEngine.csproj", "{022E9A20-96FF-4D07-9C4C-5F4A1D0FBB83}"

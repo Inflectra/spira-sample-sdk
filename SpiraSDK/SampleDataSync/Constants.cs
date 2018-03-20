@@ -13,7 +13,7 @@ namespace SampleDataSync
         /// <summary>
         /// The path to the Spira web service relative to the application's base URL
         /// </summary>
-        public const string WEB_SERVICE_URL_SUFFIX = "/Services/v4_0/ImportExport.svc";
+        public const string WEB_SERVICE_URL_SUFFIX = "/Services/v5_0/SoapService.svc";
 
         //Spira artifact prefixes
         public const string INCIDENT_PREFIX = "IN";

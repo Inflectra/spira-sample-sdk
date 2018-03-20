@@ -18,7 +18,7 @@ namespace SampleDataSync
         /// <param name="fullUri">The URI</param>
         /// <returns>The client class</returns>
         /// <remarks>We need to do this in code because the app.config file is not available in VSTO</remarks>
-        public static SpiraImportExport.ImportExportClient CreateClient(Uri fullUri)
+        public static SpiraSoapService.SoapServiceClient CreateClient(Uri fullUri)
         {
             //Configure the binding
             BasicHttpBinding httpBinding = new BasicHttpBinding();
@@ -49,10 +49,10 @@ namespace SampleDataSync
 
             //Create the new client with endpoint and HTTP Binding
             EndpointAddress endpointAddress = new EndpointAddress(fullUri.AbsoluteUri);
-            SpiraImportExport.ImportExportClient spiraImportExport = new SpiraImportExport.ImportExportClient(httpBinding, endpointAddress);
+            SpiraSoapService.SoapServiceClient spiraSoapService = new SpiraSoapService.SoapServiceClient(httpBinding, endpointAddress);
 
             //Modify the operation behaviors to allow unlimited objects in the graph
-            foreach (var operation in spiraImportExport.Endpoint.Contract.Operations)
+            foreach (var operation in spiraSoapService.Endpoint.Contract.Operations)
             {
                 var behavior = operation.Behaviors.Find<DataContractSerializerOperationBehavior>() as DataContractSerializerOperationBehavior;
                 if (behavior != null)
@@ -61,7 +61,7 @@ namespace SampleDataSync
                 }
             }
 
-            return spiraImportExport;
+            return spiraSoapService;
         }
     }
 }
