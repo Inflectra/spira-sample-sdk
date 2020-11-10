@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Inflectra Corporation")]
 [assembly: AssemblyProduct("SampleDataSync")]
-[assembly: AssemblyCopyright("Copyright © Inflectra Corporation 2006-2013")]
+[assembly: AssemblyCopyright("Copyright © Inflectra Corporation 2006-2020")]
 [assembly: AssemblyTrademark("SpiraTest, SpiraPlan and SpiraTeam are either trademarks or registered trademarks of Inflectra Corporation")]
 [assembly: AssemblyCulture("")]
 

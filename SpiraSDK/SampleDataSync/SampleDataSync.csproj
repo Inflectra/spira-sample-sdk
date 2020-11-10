@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleDataSync</RootNamespace>
     <AssemblyName>SampleDataSync</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -104,6 +104,9 @@
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteComponent.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteCredentials.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteCustomList.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -173,6 +176,9 @@
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteProjectRole.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteProjectTemplate.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteProjectUser.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -189,6 +195,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteRequirement.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteRequirementImportance.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteRequirementStatus.datasource">
@@ -209,6 +218,9 @@
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteSavedFilter.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteSavedReport.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteSetting.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -224,10 +236,16 @@
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteSourceCodeRevision.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTableData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTask.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTaskFolder.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTaskPriority.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTaskStatus.datasource">
@@ -243,6 +261,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTestCaseParameter.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTestCasePriority.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteTestCaseStatus.datasource">
@@ -296,7 +317,7 @@
     <None Include="Service References\SpiraSoapService\SampleDataSync.SpiraSoapService.RemoteWorkflowTransition.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\SpiraSoapService\SoapService.wsdl" />
+    <None Include="Service References\SpiraSoapService\SoapService1.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\SpiraSoapService\" />
@@ -324,9 +345,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\SpiraSoapService\SoapService.disco" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Service References\SpiraSoapService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
@@ -337,6 +355,9 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\SpiraSoapService\SoapService1.disco" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

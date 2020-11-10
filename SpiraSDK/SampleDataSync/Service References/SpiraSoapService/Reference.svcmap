@@ -19,11 +19,11 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://localhost/Spira/Services/v5_0/SoapService.svc" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://localhost/Spira/Services/v6_0/SoapService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="SoapService.wsdl" MetadataType="Wsdl" ID="d3da7b59-0059-4d01-8bce-f605eaee239a" SourceId="1" SourceUrl="http://localhost/Spira/Services/v5_0/SoapService.svc?wsdl" />
-    <MetadataFile FileName="SoapService.disco" MetadataType="Disco" ID="6b0e0db9-e2d5-43a7-908c-b45e574ad7e9" SourceId="1" SourceUrl="http://localhost/Spira/Services/v5_0/SoapService.svc?disco" />
+    <MetadataFile FileName="SoapService1.disco" MetadataType="Disco" ID="b4485a72-8a45-49c1-8e80-eaa5197426fe" SourceId="1" SourceUrl="http://localhost/Spira/Services/v6_0/SoapService.svc?disco" />
+    <MetadataFile FileName="SoapService1.wsdl" MetadataType="Wsdl" ID="ebda9d40-6944-42b9-9600-06f863910817" SourceId="1" SourceUrl="http://localhost/Spira/Services/v6_0/SoapService.svc?wsdl" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

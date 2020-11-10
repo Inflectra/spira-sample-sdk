@@ -16,7 +16,7 @@ namespace SampleVersionControlProvider
     /// Sample plug-in that illustrates how you can write a plugin for SpiraPlan/Team that allows you to connect
     /// to a third-party Version Control / Software Configuration Management (SCM) system
     /// </summary>
-    public class SampleVersionControlPlugIn : IVersionControlPlugIn
+    public class SampleVersionControlPlugIn : IVersionControlPlugIn2
     {
         protected static EventLog applicationEventLog = null;
 
@@ -37,7 +37,7 @@ namespace SampleVersionControlProvider
         /// <param name="custom04">Custom parameters that are provider-specific</param>
         /// <param name="custom05">Custom parameters that are provider-specific</param>
         /// <remarks>Throws an exception if unable to connect or authenticate</remarks>
-        public object Initialize(string connection, NetworkCredential credentials, Dictionary<string, string> parameters, EventLog eventLog, string custom01, string custom02, string custom03, string custom04, string custom05)
+        public object Initialize(string connection, NetworkCredential credentials, Dictionary<string, string> parameters, EventLog eventLog, string cacheFolder, string custom01, string custom02, string custom03, string custom04, string custom05)
         {
             /*
              * TODO: Replace with real logic for checking the connection information and the username/password
@@ -61,6 +61,28 @@ namespace SampleVersionControlProvider
             token.Password = credentials.Password;
 
             return token;
+        }
+
+        /// <summary>Tests the given settings to verify connectivity to the repository.</summary>
+        /// <param name="connection">The connection info</param>
+        /// <param name="credentials">The login/password/domain for the provider</param>
+        /// <param name="parameters">Any custom parameters</param>
+        /// <param name="eventLog">A handle to the Windows Event Log used by Spira</param>
+        /// <param name="custom01">Provider-specific parameter</param>
+        /// <param name="custom02">Provider-specific parameter</param>
+        /// <param name="custom03">Provider-specific parameter</param>
+        /// <param name="custom04">Provider-specific parameter</param>
+        /// <param name="custom05">Provider-specific parameter</param>
+        /// <param name="cacheFolder">The location to the folder where any cached data can be stored</param>
+        /// <remarks>True if connection was successful and good. False, or throws exception if failure.</remarks>
+        public bool TestConnection(string connection, NetworkCredential credentials, Dictionary<string, string> parameters, EventLog eventLog, string cacheFolder, string custom01, string custom02, string custom03, string custom04, string custom05)
+        {
+            /*
+             * TODO: Replace with a real implementation that is appropriate for the provider
+             */
+
+            //Just returns true
+            return true;
         }
 
         /// <summary>
@@ -100,42 +122,15 @@ namespace SampleVersionControlProvider
         }
 
         /// <summary>
-        /// Retrieves a single file by its unique key
-        /// </summary>
-        /// <param name="token">The connection token for the provider</param>
-        /// <param name="fileKey">The file identifier</param>
-        /// <returns>Single version control file</returns>
-        public VersionControlFile RetrieveFile(object token, string fileKey)
-        {
-            /*
-             * TODO: Replace with a real implementation that is appropriate for the provider
-             */
-            
-            //Verify the token
-            AuthenticationToken authToken = InternalFunctions.VerifyToken(token);
-
-            //For this test provider, just get the list of files and then find the matching one
-            List<VersionControlFile> versionControlFiles = this.RetrieveFilesByFolder(token, "", "", true, null);
-            foreach (VersionControlFile versionControlFile in versionControlFiles)
-            {
-                if (versionControlFile.FileKey == fileKey)
-                {
-                    return versionControlFile;
-                }
-            }
-            //Otherwise throw a not found exception
-            throw new VersionControlArtifactNotFoundException("Could not find file '" + fileKey + "'");
-        }
-
-        /// <summary>
         /// Opens the contents of a single file by its key, if the revision is specified, need to return the
         /// details of the file for that specific revision, otherwise just return the most recent
         /// </summary>
         /// <param name="token">The connection token for the provider</param>
         /// <param name="fileKey">The file identifier</param>
+        /// <param name="branchKey">The name of the branch</param>
         /// <param name="revisionKey">The revision identifier (optional)</param>
         /// <returns></returns>
-        public VersionControlFileStream OpenFile(object token, string fileKey, string revisionKey)
+        public VersionControlFileStream OpenFile(object token, string fileKey, string revisionKey, string branchKey)
         {
             /*
              * TODO: Replace with a real implementation that is appropriate for the provider
@@ -167,6 +162,40 @@ namespace SampleVersionControlProvider
             return versionControlFileStream;
         }
 
+        /// <summary>Returns a list of all avaiable branches.</summary>
+        /// <param name="token">The source control library's unique token.</param>
+        /// <returns>A list of avaiable branches.</returns>
+        public List<VersionControlBranch> RetrieveBranches(object token)
+        {
+            /*
+             * TODO: Replace with a real implementation that is appropriate for the provider
+             */
+
+            //Verify the token
+            AuthenticationToken authToken = InternalFunctions.VerifyToken(token);
+
+            //Sample code to retrieve some random branch names
+            List<VersionControlBranch> retList = new List<VersionControlBranch>();
+
+            //Three branches..
+            VersionControlBranch branch1 = new VersionControlBranch();
+            branch1.BranchKey = "Master";
+            branch1.IsDefault = true;
+            retList.Add(branch1);
+
+            VersionControlBranch branch2 = new VersionControlBranch();
+            branch2.BranchKey = "Branch_12";
+            branch2.IsDefault = false;
+            retList.Add(branch2);
+
+            VersionControlBranch branch3 = new VersionControlBranch();
+            branch3.BranchKey = "Fork" + DateTime.Now.ToString("yyyyMMdd");
+            branch3.IsDefault = false;
+            retList.Add(branch3);
+
+            return retList;
+        }
+
         /// <summary>
         /// Closes the data stream provided by OpenFile. Clients must NOT CLOSE THE STREAM DIRECTLY
         /// </summary>
@@ -185,8 +214,9 @@ namespace SampleVersionControlProvider
         /// </summary>
         /// <param name="token">The connection token for the provider</param>
         /// <param name="folderKey">The folder identifier</param>
+        /// <param name="branchKey">The name of the branch</param>
         /// <returns>Single version control folder</returns>
-        public VersionControlFolder RetrieveFolder(object token, string folderKey)
+        public VersionControlFolder RetrieveFolder(object token, string folderKey, string branchKey)
         {
             /*
              * TODO: Replace with a real implementation that is appropriate for the provider
@@ -214,10 +244,11 @@ namespace SampleVersionControlProvider
         /// <summary>
         /// Retrieves a list of folders under the passed in parent folder
         /// </summary>
+        /// <param name="branchKey">The name of the branch</param>
         /// <param name="token">The connection token for the provider</param>
         /// <param name="parentFolderKey">The parent folder (or NullString if root folders requested)</param>
         /// <returns>List of version control folders</returns>
-        public List<VersionControlFolder> RetrieveFolders(object token, string parentFolderKey)
+        public List<VersionControlFolder> RetrieveFolders(object token, string parentFolderKey, string branchKey)
         {
             /*
              * TODO: Replace with a real implementation that is appropriate for the provider
@@ -257,168 +288,32 @@ namespace SampleVersionControlProvider
             return versionControlFolders;
         }
 
-        /// <summary>
-        /// Retrieves a list of revisions for a specific file
-        /// </summary>
-        /// <param name="token">The connection token for the provider</param>
-        /// <param name="filters">Any filters to apply to the results</param>
-        /// <param name="sortAscending">Do we want to sort the results ascending or descending</param>
-        /// <param name="sortProperty">What fields do we want to sort the results on</param>
-        /// <param name="fileKey">The key of the file</param>
-        /// <returns>List of revisions</returns>
-        /// <remarks>For this test provider, it always returns the same list, which is a subset of the total list of revisions</remarks>
-        public List<VersionControlRevision> RetrieveRevisionsForFile(object token, string fileKey, string sortProperty, bool sortAscending, Hashtable filters)
+        /// <summary>Returns all revisions that have occured since the specified date.</summary>
+        /// <param name="token">The source control library's unique token.</param>
+        /// <param name="branchKey">The key for the branch to pull the revisions/commits from.</param>
+        /// <param name="newerThan">The cutoff date for revisions to return.</param>
+        /// <returns>A list of revisions that are newer than the specified date.</returns>
+        public List<VersionControlRevision> RetrieveRevisionsSince(object token, string branchKey, DateTime newerThan)
         {
             /*
              * TODO: Replace with a real implementation that is appropriate for the provider
              */
 
-            //Verify the token
-            AuthenticationToken authToken = InternalFunctions.VerifyToken(token);
-
-            List<VersionControlRevision> revisions = this.RetrieveRevisions(token, sortProperty, sortAscending, filters);
-
-            //Remove a couple of entries so we know that this was the method used
-            if (revisions.Count >= 1)
-            {
-                revisions.Remove(revisions[0]);
-            }
-            if (revisions.Count >= 11)
-            {
-                revisions.Remove(revisions[10]);
-            }
-            return revisions;
+            //We just return all revisions in this test example
+            return this.RetrieveRevisions(token, branchKey);
         }
-
-        /// <summary>
-        /// Retrieves a list of source code revisions associated with a specific SpiraTeam artifact
-        /// </summary>
-        /// <param name="token">The connection token for the provider</param>
-        /// <param name="artifactPrefix">The two-letter prefix for the artifact</param>
-        /// <param name="artifactId">The id of the artifact</param>
-        /// <returns>A list of associated revisions</returns>
-        public List<VersionControlRevision> RetrieveRevisionsForArtifact(object token, string artifactPrefix, int artifactId)
-        {
-            /*
-             * TODO: This sample code will work but does not offer particularly good performance since it needs to retrieve all the
-             *       revisions in the system and then examine each one for matching artifacts. If you can use the SCM system to do
-             *       the matching, it will generally be much faster.
-             */
-
-            //We need to get the complete list of revisions in the repository first
-            List<VersionControlRevision> revisions = this.RetrieveRevisions(token, "", true, null);
-
-            //Now we need to find ones that match the artifact
-            Regex regex = new Regex(@"\[" + artifactPrefix + ":[0]*" + artifactId.ToString() + @"\]");
-            List<VersionControlRevision> matchedRevisions = new List<VersionControlRevision>();
-            foreach (VersionControlRevision revision in revisions)
-            {
-                if (!String.IsNullOrEmpty(revision.Message) && regex.Match(revision.Message).Success)
-                {
-                    matchedRevisions.Add(revision);
-                }
-            }
-
-            return matchedRevisions;
-        }
-
-        /// <summary>
-        /// Retrieves a list of artifact associations for the specified revision
-        /// </summary>
-        /// <param name="token">The connection token for the provider</param>
-        /// <param name="revisionKey">The key of the revision</param>
-        /// <returns>A list of artifact associations</returns>
-        public List<VersionControlRevisionAssociation> RetrieveAssociationsForRevision(object token, string revisionKey)
-        {
-            /*
-             * TODO: The implementation is provider-dependent, however in most cases you will need to parse the text in the revision
-             *      for the list of tokens that signify SpiraPlan/Team artifacts. An example is provided below that will work in most cases
-             */
-
-            //First we need to actually retrieve the revision record
-            try
-            {
-                VersionControlRevision versionControlRevision = this.RetrieveRevision(token, revisionKey);
-                if (versionControlRevision == null)
-                {
-                    //If the revision can't be found, just return a null to indicate no associations
-                    return null;
-                }
-
-                //Now get the revision string and parse out the associations from the included tokens
-                string revisionMessage = versionControlRevision.Message;
-                List<VersionControlRevisionAssociation> versionControlRevisionAssociations = new List<VersionControlRevisionAssociation>();
-                if (!String.IsNullOrEmpty(revisionMessage))
-                {
-                    Regex regExp = new Regex(@"\[([A-Z]{2,}):([0-9]+)\]", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-                    MatchCollection artMatches = regExp.Matches(revisionMessage);
-                    foreach (Match artMatch in artMatches)
-                    {
-                        VersionControlRevisionAssociation versionControlRevisionAssociation = new VersionControlRevisionAssociation();
-
-                        versionControlRevisionAssociation.ArtifactId = Int32.Parse(artMatch.Groups[2].Value);
-                        versionControlRevisionAssociation.ArtifactTypePrefix = artMatch.Groups[1].Value;
-                        versionControlRevisionAssociation.AssociationDate = versionControlRevision.UpdateDate;
-                        versionControlRevisionAssociation.Comment = "";
-                        versionControlRevisionAssociation.RevisionKey = revisionKey;
-                        versionControlRevisionAssociations.Add(versionControlRevisionAssociation);
-                    }
-                }
-
-                return versionControlRevisionAssociations;
-            }
-            catch (VersionControlArtifactNotFoundException)
-            {
-                //If the revision can't be found, just return a null to indicate no associations
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a single revision by its key
-        /// </summary>
-        /// <param name="token">The connection token for the provider</param>
-        /// <param name="revisionKey">The revision identifier</param>
-        /// <returns>The revision requested</returns>
-        public VersionControlRevision RetrieveRevision(object token, string revisionKey)
-        {
-            /*
-             * TODO: This implementation does not provide very good performanace, ideally should use a built-in 
-             *      method of the SCM system to actually get the revision by its ID/key rather that getting all
-             *      revisions and looping (very slow)
-             */
-
-            //Verify the token
-            AuthenticationToken authToken = InternalFunctions.VerifyToken(token);
-
-            //For this test provider, just get the list of revisions and then find the matching one
-            List<VersionControlRevision> versionControlRevisions = this.RetrieveRevisions(token, "", true, null);
-            foreach (VersionControlRevision versionControlRevision in versionControlRevisions)
-            {
-                if (versionControlRevision.RevisionKey == revisionKey)
-                {
-                    return versionControlRevision;
-                }
-            }
-            //Otherwise throw a not found exception
-            throw new VersionControlArtifactNotFoundException("Could not find revision '" + revisionKey + "'");
-        }
-
 
         /// <summary>
         /// Retrieves a list of revisions for the current repository
         /// </summary>
         /// <param name="token">The connection token for the provider</param>
-        /// <param name="filters">Any filters to apply to the results</param>
-        /// <param name="sortAscending">Do we want to sort the results ascending or descending</param>
-        /// <param name="sortProperty">What fields do we want to sort the results on</param>
+        /// <param name="branchKey">The name of the branch</param>
         /// <returns>List of revisions</returns>
         /// <remarks>For this test provider, it always returns the same list</remarks>
-        public List<VersionControlRevision> RetrieveRevisions(object token, string sortProperty, bool sortAscending, Hashtable filters)
+        public List<VersionControlRevision> RetrieveRevisions(object token, string branchKey)
         {
             /*
-             * TODO: Replace with a real implementation that is appropriate for the provider, should use the SCM system to do the sorting
-             *          and filtering if that is possible
+             * TODO: Replace with a real implementation that is appropriate for the provider
              */
 
             //Verify the token
@@ -443,115 +338,6 @@ namespace SampleVersionControlProvider
             versionControlRevisions.Add(new VersionControlRevision("0015", "rev0015", "Fred Bloggs", "The artifact was changed in this version to fix the issue with the data access component", DateTime.Now, true, false));
             versionControlRevisions.Add(new VersionControlRevision("0016", "rev0016", "Fred Bloggs", "The artifact was changed in this version to fix the issue with the data access component", DateTime.Now, true, false));
 
-            //Now see if we need to filter the results
-            if (filters != null)
-            {
-                List<VersionControlRevision> filteredVersionControlRevisions = new List<VersionControlRevision>();
-                foreach (VersionControlRevision versionControlRevision in versionControlRevisions)
-                {
-                    bool match = true;
-                    //Name filtering
-                    if (filters["Name"] != null)
-                    {
-                        string filterText = (string)filters["Name"];
-                        if (!versionControlRevision.Name.Contains(filterText))
-                        {
-                            match = false;
-                        }
-                    }
-                    //Author filtering
-                    if (filters["Author"] != null)
-                    {
-                        string filterText = (string)filters["Author"];
-                        if (!versionControlRevision.Author.Contains(filterText))
-                        {
-                            match = false;
-                        }
-                    }
-                    //Message filtering
-                    if (filters["Message"] != null)
-                    {
-                        string filterText = (string)filters["Message"];
-                        if (!versionControlRevision.Message.Contains(filterText))
-                        {
-                            match = false;
-                        }
-                    }
-                    //UpdateDate filtering
-                    if (filters["UpdateDate"] != null)
-                    {
-                        DateRange filterRange = (DateRange)filters["UpdateDate"];
-                        if (filterRange.StartDate.HasValue && versionControlRevision.UpdateDate < filterRange.StartDate.Value.Date)
-                        {
-                            match = false;
-                        }
-                        if (filterRange.EndDate.HasValue && versionControlRevision.UpdateDate > filterRange.EndDate.Value.Date)
-                        {
-                            match = false;
-                        }
-                    }
-                    //ContentChanged filtering
-                    if (filters["ContentChanged"] != null)
-                    {
-                        string flagYn = (string)filters["ContentChanged"];
-                        if ((versionControlRevision.ContentChanged && flagYn == "N") || (!versionControlRevision.ContentChanged && flagYn == "Y"))
-                        {
-                            match = false;
-                        }
-                    }
-                    //PropertiesChanged filtering
-                    if (filters["PropertiesChanged"] != null)
-                    {
-                        string flagYn = (string)filters["PropertiesChanged"];
-                        if ((versionControlRevision.PropertiesChanged && flagYn == "N") || (!versionControlRevision.PropertiesChanged && flagYn == "Y"))
-                        {
-                            match = false;
-                        }
-                    }
-
-                    //Add the item if we have a match
-                    if (match)
-                    {
-                        filteredVersionControlRevisions.Add(versionControlRevision);
-                    }
-                }
-                versionControlRevisions = filteredVersionControlRevisions;
-            }
-
-            //Now see if we need to sort it
-            if (String.IsNullOrEmpty(sortProperty))
-            {
-                //Use the default sort
-                versionControlRevisions.Sort();
-            }
-            else
-            {
-                if (sortProperty == "Name")
-                {
-                    versionControlRevisions.Sort((sortAscending) ? VersionControlRevision.NameAscComparison : VersionControlRevision.NameDescComparison);
-                }
-                if (sortProperty == "Author")
-                {
-                    versionControlRevisions.Sort((sortAscending) ? VersionControlRevision.AuthorAscComparison : VersionControlRevision.AuthorDescComparison);
-                }
-                if (sortProperty == "Message")
-                {
-                    versionControlRevisions.Sort((sortAscending) ? VersionControlRevision.MessageAscComparison : VersionControlRevision.MessageDescComparison);
-                }
-                if (sortProperty == "UpdateDate")
-                {
-                    versionControlRevisions.Sort((sortAscending) ? VersionControlRevision.UpdateDateAscComparison : VersionControlRevision.UpdateDateDescComparison);
-                }
-                if (sortProperty == "ContentChanged")
-                {
-                    versionControlRevisions.Sort((sortAscending) ? VersionControlRevision.ContentChangedAscComparison : VersionControlRevision.ContentChangedDescComparison);
-                }
-                if (sortProperty == "PropertiesChanged")
-                {
-                    versionControlRevisions.Sort((sortAscending) ? VersionControlRevision.PropertiesChangedAscComparison : VersionControlRevision.PropertiesChangedDescComparison);
-                }
-            }
-
             return versionControlRevisions;
         }
 
@@ -560,12 +346,10 @@ namespace SampleVersionControlProvider
         /// </summary>
         /// <param name="token">The connection token for the provider</param>
         /// <param name="revisionKey">The revision we want the files for</param>
-        /// <param name="filters">Any filters to apply to the results</param>
-        /// <param name="sortAscending">Do we want to sort the results ascending or descending</param>
-        /// <param name="sortProperty">What fields do we want to sort the results on</param>
+        /// <param name="branchKey">The name of the branch</param>
         /// <returns>List of files</returns>
         /// <remarks>For this test provider, it always returns the same list</remarks>
-        public List<VersionControlFile> RetrieveFilesForRevision(object token, string revisionKey, string sortProperty, bool sortAscending, Hashtable filters)
+        public List<VersionControlFile> RetrieveFilesForRevision(object token, string revisionKey, string branchKey)
         {
             /*
              * TODO: Replace with a real implementation that is appropriate for the provider.
@@ -575,7 +359,7 @@ namespace SampleVersionControlProvider
             //Verify the token
             AuthenticationToken authToken = InternalFunctions.VerifyToken(token);
 
-            return this.RetrieveFilesByFolder(token, "", sortProperty, sortAscending, filters);
+            return this.RetrieveFilesByFolder(token, "", branchKey);
         }
 
         /// <summary>
@@ -583,15 +367,13 @@ namespace SampleVersionControlProvider
         /// </summary>
         /// <param name="token">The connection token for the provider</param>
         /// <param name="folderKey">The folder we want the files for</param>
-        /// <param name="filters">Any filters to apply to the results</param>
-        /// <param name="sortAscending">Do we want to sort the results ascending or descending</param>
-        /// <param name="sortProperty">What fields do we want to sort the results on</param>
+        /// <param name="branchKey">The name of the branch</param>
         /// <returns>List of files</returns>
         /// <remarks>For this test provider, it always returns the same list</remarks>
-        public List<VersionControlFile> RetrieveFilesByFolder(object token, string folderKey, string sortProperty, bool sortAscending, Hashtable filters)
+        public List<VersionControlFile> RetrieveFilesByFolder(object token, string folderKey, string branchKey)
         {
             /*
-             * TODO: Replace with a real implementation that is appropriate for the provider. Ideally sorting/filtering should be done natively by the SCM system
+             * TODO: Replace with a real implementation that is appropriate for the provider.
              */
 
             //Verify the token
@@ -621,115 +403,6 @@ namespace SampleVersionControlProvider
             versionControlFiles.Add(new VersionControlFile("test://Server/Root/Files/Filename29.ext", "Document Filename29.aspx", 100, "Fred Bloggs", "0001", "rev0001", DateTime.Now, VersionControlFile.VersionControlActionEnum.Modified));
             versionControlFiles.Add(new VersionControlFile("test://Server/Root/Files/Filename30.ext", "Document Filename30.asp", 105, "Fred Bloggs", "0005", "rev0005", DateTime.Now, VersionControlFile.VersionControlActionEnum.Modified));
             versionControlFiles.Add(new VersionControlFile("test://Server/Root/Files/Filename31.ext", "Document Filename31.py", 75, "Fred Bloggs", "0006", "rev0006", DateTime.Now, VersionControlFile.VersionControlActionEnum.Added));
-
-            //Now see if we need to filter the results
-            if (filters != null)
-            {
-                List<VersionControlFile> filteredVersionControlFiles = new List<VersionControlFile>();
-                foreach (VersionControlFile versionControlFile in versionControlFiles)
-                {
-                    bool match = true;
-                    //Name filtering
-                    if (filters["Name"] != null)
-                    {
-                        string filterText = (string)filters["Name"];
-                        if (!versionControlFile.Name.Contains(filterText))
-                        {
-                            match = false;
-                        }
-                    }
-                    //Size filtering
-                    if (filters["Size"] != null)
-                    {
-                        int filterValue = (int)filters["Size"];
-                        if (versionControlFile.Size != filterValue)
-                        {
-                            match = false;
-                        }
-                    }
-                    //Author filtering
-                    if (filters["Author"] != null)
-                    {
-                        string filterText = (string)filters["Author"];
-                        if (!versionControlFile.Author.Contains(filterText))
-                        {
-                            match = false;
-                        }
-                    }
-                    //Revision filtering
-                    if (filters["Revision"] != null)
-                    {
-                        string filterText = (string)filters["Revision"];
-                        if (!versionControlFile.Revision.Contains(filterText))
-                        {
-                            match = false;
-                        }
-                    }
-                    //Action filtering
-                    if (filters["Action"] != null)
-                    {
-                        string filterText = (string)filters["Action"];
-                        if (!versionControlFile.Action.ToString().Contains(filterText))
-                        {
-                            match = false;
-                        }
-                    }
-                    //LastUpdated filtering
-                    if (filters["LastUpdated"] != null)
-                    {
-                        DateRange filterRange = (DateRange)filters["LastUpdated"];
-                        if (filterRange.StartDate.HasValue && versionControlFile.LastUpdated < filterRange.StartDate.Value.Date)
-                        {
-                            match = false;
-                        }
-                        if (filterRange.EndDate.HasValue && versionControlFile.LastUpdated > filterRange.EndDate.Value.Date)
-                        {
-                            match = false;
-                        }
-                    }
-
-                    //Add the item if we have a match
-                    if (match)
-                    {
-                        filteredVersionControlFiles.Add(versionControlFile);
-                    }
-                }
-                versionControlFiles = filteredVersionControlFiles;
-            }
-
-            //Now see if we need to sort it
-            if (String.IsNullOrEmpty(sortProperty))
-            {
-                //Use the default sort
-                versionControlFiles.Sort();
-            }
-            else
-            {
-                if (sortProperty == "Name")
-                {
-                    versionControlFiles.Sort((sortAscending) ? VersionControlFile.NameAscComparison : VersionControlFile.NameDescComparison);
-                }
-                if (sortProperty == "Author")
-                {
-                    versionControlFiles.Sort((sortAscending) ? VersionControlFile.AuthorAscComparison : VersionControlFile.AuthorDescComparison);
-                }
-                if (sortProperty == "Revision")
-                {
-                    versionControlFiles.Sort((sortAscending) ? VersionControlFile.RevisionAscComparison : VersionControlFile.RevisionDescComparison);
-                }
-                if (sortProperty == "Size")
-                {
-                    versionControlFiles.Sort((sortAscending) ? VersionControlFile.SizeAscComparison : VersionControlFile.SizeDescComparison);
-                }
-                if (sortProperty == "LastUpdated")
-                {
-                    versionControlFiles.Sort((sortAscending) ? VersionControlFile.LastUpdatedAscComparison : VersionControlFile.LastUpdatedDescComparison);
-                }
-                if (sortProperty == "Action")
-                {
-                    versionControlFiles.Sort((sortAscending) ? VersionControlFile.ActionAscComparison : VersionControlFile.ActionDescComparison);
-                }
-            }
            
             return versionControlFiles;
         }

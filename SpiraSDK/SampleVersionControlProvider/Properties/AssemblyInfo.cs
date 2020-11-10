@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Inflectra Corporation")]
 [assembly: AssemblyProduct("SampleVersionControlProvider")]
-[assembly: AssemblyCopyright("Copyright © Inflectra Corporation 2006-2013")]
+[assembly: AssemblyCopyright("Copyright © Inflectra Corporation 2006-2020")]
 [assembly: AssemblyTrademark("SpiraPlan and SpiraTeam are either trademarks or registered trademarks of Inflectra Corporation")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("6.0.0.0")]
+[assembly: AssemblyFileVersion("6.0.0.0")]

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="kPpbNEQWCQNlkh8tam8Gj4G3YqQ=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="5+MPVy/Q4zQT85R9HiNrCG4wmZE=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_ISoapService">
       <properties>
@@ -221,10 +221,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_ISoapService" contract="SpiraSoapService.ISoapService" bindingType="basicHttpBinding" address="http://localhost/Spira/Services/v5_0/SoapService.svc" bindingConfiguration="BasicHttpBinding_ISoapService">
+    <endpoint name="BasicHttpBinding_ISoapService" contract="SpiraSoapService.ISoapService" bindingType="basicHttpBinding" address="http://localhost/Spira/Services/v6_0/SoapService.svc" bindingConfiguration="BasicHttpBinding_ISoapService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://localhost/Spira/Services/v5_0/SoapService.svc</serializedValue>
+          <serializedValue>http://localhost/Spira/Services/v6_0/SoapService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
@@ -306,10 +306,10 @@
         </property>
       </properties>
     </endpoint>
-    <endpoint name="BasicHttpBinding_ISoapService1" contract="SpiraSoapService.ISoapService" bindingType="basicHttpBinding" address="https://tardis.corp.inflectra.com/Spira/Services/v5_0/SoapService.svc" bindingConfiguration="BasicHttpBinding_ISoapService1">
+    <endpoint name="BasicHttpBinding_ISoapService1" contract="SpiraSoapService.ISoapService" bindingType="basicHttpBinding" address="https://tardis.corp.inflectra.com/Spira/Services/v6_0/SoapService.svc" bindingConfiguration="BasicHttpBinding_ISoapService1">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>https://tardis.corp.inflectra.com/Spira/Services/v5_0/SoapService.svc</serializedValue>
+          <serializedValue>https://tardis.corp.inflectra.com/Spira/Services/v6_0/SoapService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
